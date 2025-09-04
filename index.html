@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Wędliny z Druciarni — Zamówienia</title>
+<meta name="theme-color" content="#111827">
+<style>
+  :root {
+    --bg: #0b0f1a;
+    --card: #111827;
+    --muted: #9ca3af;
+    --text: #e5e7eb;
+    --accent: #fbbf24;
+    --btn: #1f2937;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+  .app { display:flex; flex-direction:column; min-height:100dvh; }
+  .topbar {
+    position: sticky; top: 0; z-index: 10;
+    display:flex; align-items:center; gap:12px;
+    padding: 12px 16px;
+    background: rgba(17,24,39,.9);
+    backdrop-filter: saturate(180%) blur(8px);
+    border-bottom: 1px solid #1f2937;
+  }
+  .logo { height: 56px; width:auto; border-radius:12px; background:#0b0f1a; padding:6px; }
+  .title { display:flex; flex-direction:column; line-height:1.1; }
+  .title h1 { margin:0; font-size: 18px; }
+  .title .tag { font-size:12px; color: var(--muted); }
+  .content { flex:1; padding: 16px; display:grid; gap:14px; }
+  .card {
+    background: var(--card);
+    border:1px solid #1f2937;
+    border-radius:16px;
+    padding:14px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.2);
+  }
+  h3 { margin:0 0 8px 0; font-size:16px; }
+  input, select, textarea, button { font: inherit; }
+  input, select, textarea {
+    width:100%; padding:14px; border-radius:12px; border:1px solid #293445;
+    background:#0b1220; color: var(--text);
+  }
+  textarea { min-height: 96px; }
+  .grid-2 { display:grid; gap:10px; grid-template-columns: 1fr; }
+  @media (min-width: 760px) { .grid-2 { grid-template-columns: 1fr 1fr; } }
+  .row { display:grid; gap:10px; grid-template-columns: 1fr; }
+  @media (min-width: 520px) { .row { grid-template-columns: 5fr 5fr 3fr; align-items:center; } }
+  .qty { display:grid; grid-template-columns: auto 1fr auto; gap:8px; }
+  .btn {
+    display:inline-flex; align-items:center; justify-content:center; gap:10px;
+    padding:14px 16px; border-radius:14px; border:1px solid #2a3648;
+    background: var(--btn); color: var(--text); text-decoration:none; cursor:pointer;
+    min-height: 48px;
+  }
+  .btn.primary { background: linear-gradient(180deg, #f59e0b, #f59e0b 60%, #d97706); color:#111; border-color:#f59e0b; }
+  .btn.ghost { background: transparent; }
+  .actions-bottom {
+    position: sticky; bottom: 0; z-index: 10;
+    background: rgba(17,24,39,.96);
+    backdrop-filter: blur(8px);
+    border-top:1px solid #1f2937;
+    padding:10px 12px;
+  }
+  .actions-grid {
+    display:grid; gap:8px;
+    grid-template-columns: 1fr 1fr;
+  }
+  @media (min-width: 560px) { .actions-grid { grid-template-columns: repeat(6, 1fr); } }
+  .pill { display:inline-block; padding:6px 10px; border-radius:999px; background:#0b1220; border:1px solid #2a3648; color:var(--muted); font-size:12px; }
+  .muted { color: var(--muted); font-size:12px; }
+  .summary { background:#0b1220; border:1px solid #2a3648; border-radius:12px; padding:12px; white-space:pre-wrap; }
+  .search input { padding-left:44px; }
+  .search { position:relative; }
+  .search .icon { position:absolute; left:12px; top:50%; transform:translateY(-50%); opacity:.6; }
+  .product { display:grid; gap:10px; }
+  .product .name input { font-weight:600; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <img src="logo.png" class="logo" alt="Logo" />
+    <div class="title">
+      <h1>Wędliny z Druciarni</h1>
+      <div class="tag">Formularz zamówień</div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="card">
+      <h3>Klient</h3>
+      <div class="grid-2">
+        <input id="cust-name" placeholder="Imię i nazwisko" />
+        <input id="cust-phone" placeholder="Telefon" inputmode="tel" />
+        <input id="cust-email" placeholder="E-mail (opcjonalnie)" inputmode="email" />
+        <input id="cust-date" type="date" placeholder="Data odbioru" />
+        <textarea id="cust-notes" placeholder="Uwagi do zamówienia (np. grubość, przyprawy)"></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+        <h3>Produkty</h3>
+        <div class="search" style="min-width:220px;">
+          <span class="icon">🔎</span>
+          <input id="search" placeholder="Szukaj produktu…" />
+        </div>
+      </div>
+      <div id="product-list" class="grid" style="gap:10px; margin-top:8px;"></div>
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-top:10px;">
+        <span class="pill">Razem ilość: <b id="total-qty">0</b></span>
+        <button class="btn" id="btn-add">+ Dodaj pozycję</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Wysyłka</h3>
+      <div class="grid-2">
+        <input id="dest-phone" value="48791412017" placeholder="Numer do WhatsApp/SMS (np. 48600111222)" inputmode="tel" />
+        <div></div>
+      </div>
+      <div class="muted" style="margin-top:6px;">Numer w formacie międzynarodowym, bez spacji.</div>
+    </div>
+
+    <div class="card">
+      <h3>Podsumowanie</h3>
+      <div class="summary" id="summary"></div>
+    </div>
+  </div>
+
+  <div class="actions-bottom">
+    <div class="actions-grid">
+      <button class="btn" id="btn-copy">Kopiuj</button>
+      <button class="btn" id="btn-csv">CSV</button>
+      <a class="btn" id="btn-email" href="#">E‑mail</a>
+      <a class="btn primary" id="btn-wa" href="#" target="_blank">WhatsApp</a>
+      <a class="btn" id="btn-sms" href="#">SMS</a>
+      <button class="btn ghost" id="btn-clear">Wyczyść</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const ALL_PRODUCTS = ["Szynka wędzona", "Schab wędzony", "Boczek wędzony", "Polędwiczka wieprzowa", "Karczek wędzony", "Kiełbasa wędzona", "Kiełbasa biała parzona", "Krupniok (kaszanka)", "Pasztet", "Salceson", "Ser bez przypraw", "Ser z czarnuszką", "Ser z pomidorami i bazylią", "Ser z czosnkiem", "Ser z przyprawą curry", "Ryby wędzone – makrela", "Ryby wędzone – śledź", "Ryby wędzone – łosoś"];
+
+const state = { rows: [], customer: { name:'', phone:'', email:'', pickupDate:'', notes:'' } };
+
+const els = {
+  list: document.getElementById('product-list'),
+  search: document.getElementById('search'),
+  total: document.getElementById('total-qty'),
+  summary: document.getElementById('summary'),
+  destPhone: document.getElementById('dest-phone'),
+};
+
+function loadDraft() { try {
+  const raw = localStorage.getItem('zamowienia-wedliny-app-draft');
+  if (!raw) return;
+  const data = JSON.parse(raw);
+  if (data.rows) state.rows = data.rows;
+  if (data.customer) state.customer = data.customer;
+} catch(e){} }
+
+function saveDraft() {
+  localStorage.setItem('zamowienia-wedliny-app-draft', JSON.stringify(state));
+}
+
+function initRows() {
+  if (!state.rows.length) {
+    state.rows = ALL_PRODUCTS.map(name => ({ id: slug(name), name, qty: 0, unit: 'kg' }));
+  }
+}
+
+function slug(s) { return s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
+
+function render() {
+  // Inputs -> state
+  state.customer.name = document.getElementById('cust-name').value;
+  state.customer.phone = document.getElementById('cust-phone').value;
+  state.customer.email = document.getElementById('cust-email').value;
+  state.customer.pickupDate = document.getElementById('cust-date').value;
+  state.customer.notes = document.getElementById('cust-notes').value;
+
+  // Filter
+  const q = (els.search.value || '').trim().toLowerCase();
+  const filtered = state.rows.filter(r => r.name.toLowerCase().includes(q));
+
+  // List
+  els.list.innerHTML = '';
+  filtered.forEach(r => {
+    const card = document.createElement('div');
+    card.className = 'product card';
+
+    const nameWrap = document.createElement('div');
+    nameWrap.className = 'name';
+    const name = document.createElement('input');
+    name.value = r.name;
+    name.oninput = () => { r.name = name.value; saveAndRender(); };
+    nameWrap.appendChild(name);
+
+    const qty = document.createElement('div');
+    qty.className = 'qty';
+    const minus = document.createElement('button'); minus.className = 'btn'; minus.textContent = '−';
+    minus.onclick = () => { r.qty = Math.max(0, (Number(r.qty)||0) - 1); saveAndRender(); };
+    const qtyInput = document.createElement('input');
+    qtyInput.type='number'; qtyInput.inputMode='decimal'; qtyInput.min='0'; qtyInput.step='0.1';
+    qtyInput.value = r.qty; qtyInput.oninput = () => { r.qty = qtyInput.value; saveAndRender(); };
+    const unit = document.createElement('select');
+    unit.innerHTML = '<option value="kg">kg</option><option value="szt">szt</option>';
+    unit.value = r.unit; unit.onchange = () => { r.unit = unit.value; saveAndRender(); };
+    const plus = document.createElement('button'); plus.className='btn'; plus.textContent = '+';
+    plus.onclick = () => { r.qty = (Number(r.qty)||0) + 1; saveAndRender(); };
+
+    qty.appendChild(minus); qty.appendChild(qtyInput); qty.appendChild(unit); qty.appendChild(plus);
+
+    const actions = document.createElement('div');
+    const del = document.createElement('button'); del.className='btn ghost'; del.textContent='Usuń';
+    del.onclick = () => { state.rows = state.rows.filter(x => x !== r); saveAndRender(); };
+    if (r.id.startsWith('custom-')) actions.appendChild(del);
+
+    card.appendChild(nameWrap);
+    card.appendChild(qty);
+    if (r.id.startsWith('custom-')) card.appendChild(actions);
+
+    els.list.appendChild(card);
+  });
+
+  // Totals & summary
+  const total = state.rows.reduce((s,r)=> s + (Number(r.qty)||0), 0);
+  els.total.textContent = total;
+  els.summary.textContent = buildSummary();
+
+  saveDraft();
+}
+
+function saveAndRender(){ saveDraft(); render(); }
+
+function buildSummary() {
+  const lines = [];
+  lines.push('Zamówienie na wyroby domowe — Wędliny z Druciarni');
+  lines.push(`Klient: ${state.customer.name || '(brak)'}`);
+  lines.push(`Telefon: ${state.customer.phone || '(brak)'}`);
+  if (state.customer.email) lines.push(`Email: ${state.customer.email}`);
+  if (state.customer.pickupDate) lines.push(`Odbiór: ${state.customer.pickupDate}`);
+  if (state.customer.notes) lines.push(`Uwagi: ${state.customer.notes}`);
+  lines.push('');
+  lines.push('Pozycje:');
+  state.rows.forEach(r => { const q = Number(r.qty)||0; if (q>0) lines.push(`• ${r.name} — ${q} ${r.unit}`); });
+  lines.push('');
+  const total = state.rows.reduce((s,r)=> s + (Number(r.qty)||0), 0);
+  lines.push(`Razem ilość: ${total}`);
+  lines.push('— wysłano z formularza zamówień');
+  return lines.join('\n');
+}
+
+function toEmailHref(){ const subject = encodeURIComponent('Zamówienie — Wędliny z Druciarni'); const body = encodeURIComponent(buildSummary()); const addr = (document.getElementById('cust-email').value||''); return `mailto:${addr}?subject=${subject}&body=${body}`; }
+function normPhone(s){ return (s||'').replace(/\s+/g,'').replace(/^\+/, ''); }
+function toWhatsAppHref(){ const phone = normPhone(els.destPhone.value); const text = encodeURIComponent(buildSummary()); return phone ? `https://wa.me/${phone}?text=${text}` : `https://wa.me/?text=${text}`; }
+function toSMSHref(){ const phone = normPhone(els.destPhone.value); const text = encodeURIComponent(buildSummary()); return `sms:${phone}?&body=${text}`; }
+
+function exportCSV() {
+  const header = ['Produkt','Ilość','Jednostka','Klient','Telefon','Email','Data_odbioru','Uwagi'];
+  const lines = [header.join(',')];
+  state.rows.forEach(r => { const q = Number(r.qty)||0; if (q>0) lines.push([r.name,q,r.unit,state.customer.name,state.customer.phone,state.customer.email,state.customer.pickupDate,(state.customer.notes||'').replaceAll(',', ';')].join(',')); });
+  const blob = new Blob([lines.join('\n')], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob); const a = document.createElement('a');
+  a.href = url; a.download = `zamowienie_${new Date().toISOString().slice(0,10)}.csv`; a.click(); URL.revokeObjectURL(url);
+}
+
+// Actions
+document.getElementById('btn-add').onclick = () => { state.rows.push({ id:'custom-'+Date.now(), name:'Pozycja własna', qty:0, unit:'kg' }); saveAndRender(); };
+document.getElementById('btn-clear').onclick = () => { if(!confirm('Wyczyścić wszystkie ilości i dane klienta?')) return; state.rows.forEach(r=> r.qty=0); state.customer={ name:'', phone:'', email:'', pickupDate:'', notes:'' }; document.getElementById('cust-name').value=''; document.getElementById('cust-phone').value=''; document.getElementById('cust-email').value=''; document.getElementById('cust-date').value=''; document.getElementById('cust-notes').value=''; saveAndRender(); };
+document.getElementById('btn-copy').onclick = async () => { await navigator.clipboard.writeText(buildSummary()); alert('Podsumowanie skopiowane.'); };
+document.getElementById('btn-csv').onclick = exportCSV;
+document.getElementById('btn-email').onclick = (e) => { e.currentTarget.href = toEmailHref(); };
+document.getElementById('btn-wa').onclick = (e) => { e.currentTarget.href = toWhatsAppHref(); };
+document.getElementById('btn-sms').onclick = (e) => { e.currentTarget.href = toSMSHref(); };
+
+// Inputs binding
+['cust-name','cust-phone','cust-email','cust-date','cust-notes','search'].forEach(id => { document.getElementById(id).addEventListener('input', render); });
+
+// Bootstrap
+loadDraft(); initRows();
+document.getElementById('cust-name').value = state.customer.name || '';
+document.getElementById('cust-phone').value = state.customer.phone || '';
+document.getElementById('cust-email').value = state.customer.email || '';
+document.getElementById('cust-date').value = state.customer.pickupDate || '';
+document.getElementById('cust-notes').value = state.customer.notes || '';
+render();
+</script>
+</body>
+</html>
