@@ -46,6 +46,21 @@
   .price{font-size:12px;color:var(--muted)}
   .pack{display:flex;align-items:center;gap:8px;font-size:12px;color:#cfe5d9}
   .pack-controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+
+/* === Custom tweaks requested === */
+/* Bigger checkbox and tighter spacing for vacuum packing option */
+.pack { gap: 6px; }
+.pack input[type="checkbox"] {
+  transform: scale(1.35);
+}
+
+/* Make prices a bit larger and bold, without going overboard */
+.price {
+  font-size: 14px;
+  font-weight: 700;
+  color: #e5e7eb; /* slightly brighter than muted for better emphasis */
+}
+
 </style>
 </head>
 <body>
