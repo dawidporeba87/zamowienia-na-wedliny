@@ -44,8 +44,8 @@
   .product .name{display:flex;align-items:center;gap:10px;justify-content:space-between}
   .product .name strong{font-size:14px}
   .price{font-size:14px;font-weight:700;color:#e5e7eb}
-  .pack{display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px;font-size:12px;color:#cfe5d9}
-  .pack .label{opacity:.9}
+  .pack{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:10px;font-size:12px;color:#cfe5d9}
+  .pack .label{display:inline-block;padding:10px 12px;border-radius:12px;background:#0b1220;border:1px solid #2a3648;font-size:14px;font-weight:800;letter-spacing:.2px;opacity:1}
   .pack select{width:auto;min-width:100px}
 </style>
 </head>
@@ -151,9 +151,9 @@ const PRICE_LIST = [
   { name: "Ser z przyprawą curry", unit: "szt", price: 10.00 },
   { name: "Ser z chilli", unit: "szt", price: 10.00 },
 
-  { name: "Ryby wędzone — makrela", unit: "szt", price: 22.00 },
-  { name: "Ryby wędzone — śledź", unit: "szt", price: 20.00 },
-  { name: "Ryby wędzone — łosoś", unit: "kg", price: 55.00 },
+  { name: "Ryby wędzone - makrela", unit: "szt", price: 22.00 },
+  { name: "Ryby wędzone - śledź", unit: "szt", price: 20.00 },
+  { name: "Ryby wędzone - łosoś", unit: "kg", price: 55.00 },
 
   { name: "Krupniok (kaszanka)", unit: "kg", price: 18.00 },
   { name: "Indyk (szt.)", unit: "szt", price: 25.00 }
