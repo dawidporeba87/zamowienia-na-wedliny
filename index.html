@@ -43,24 +43,10 @@
   .product{display:grid;gap:10px}
   .product .name{display:flex;align-items:center;gap:10px;justify-content:space-between}
   .product .name strong{font-size:14px}
-  .price{font-size:12px;color:var(--muted)}
-  .pack{display:flex;align-items:center;gap:8px;font-size:12px;color:#cfe5d9}
-  .pack-controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
-
-/* === Custom tweaks requested === */
-/* Bigger checkbox and tighter spacing for vacuum packing option */
-.pack { gap: 6px; }
-.pack input[type="checkbox"] {
-  transform: scale(1.35);
-}
-
-/* Make prices a bit larger and bold, without going overboard */
-.price {
-  font-size: 14px;
-  font-weight: 700;
-  color: #e5e7eb; /* slightly brighter than muted for better emphasis */
-}
-
+  .price{font-size:14px;font-weight:700;color:#e5e7eb}
+  .pack{display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px;font-size:12px;color:#cfe5d9}
+  .pack .label{opacity:.9}
+  .pack select{width:auto;min-width:100px}
 </style>
 </head>
 <body>
@@ -85,7 +71,7 @@
       </div>
       <div class="muted" style="margin-top:6px;">
         Pakowanie próżniowe możliwe za dopłatą: <strong>1,50 zł</strong> za każdą pozycję z zaznaczeniem opcji.
-        <div class="pack-controls">
+        <div class="pack-controls" style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap;">
           <button class="btn small" id="btn-pack-all">Zaznacz pakowanie dla wszystkich z ilością</button>
           <button class="btn small ghost" id="btn-pack-clear">Odznacz pakowanie wszędzie</button>
         </div>
@@ -134,7 +120,7 @@
     <div class="actions-grid">
       <button class="btn" id="btn-copy">Kopiuj</button>
       <button class="btn" id="btn-csv">CSV</button>
-      <a class="btn" id="btn-email" href="#">E‑mail</a>
+      <a class="btn" id="btn-email" href="#">E-mail</a>
       <a class="btn primary" id="btn-wa" href="#" target="_blank">WhatsApp</a>
       <a class="btn" id="btn-sms" href="#">SMS</a>
       <button class="btn ghost" id="btn-clear">Wyczyść</button>
@@ -204,6 +190,7 @@ function slug(s) { return s.toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]+/
 
 function rowPrice(r){ const meta = PRICE_MAP[r.name]; return meta ? meta.price : 0; }
 function rowUnit(r){ const meta = PRICE_MAP[r.name]; return meta ? meta.unit : r.unit; }
+function stepForUnit(unit){ return unit === 'kg' ? 0.5 : 1; }
 
 function render() {
   // Inputs -> state
@@ -239,25 +226,76 @@ function render() {
     // Ilość + jednostka
     const qty = document.createElement('div');
     qty.className = 'qty';
-    const minus = document.createElement('button'); minus.className = 'btn'; minus.textContent = '−';
-    minus.onclick = () => { r.qty = Math.max(0, (Number(r.qty)||0) - 1); saveAndRender(); };
-    const qtyInput = document.createElement('input');
-    qtyInput.type='number'; qtyInput.inputMode='decimal'; qtyInput.min='0'; qtyInput.step='0.1';
-    qtyInput.value = r.qty; qtyInput.oninput = () => { r.qty = qtyInput.value; saveAndRender(); };
+
     const unit = document.createElement('select');
     unit.innerHTML = '<option value="kg">kg</option><option value="szt">szt</option>';
-    unit.value = r.unit; unit.onchange = () => { r.unit = unit.value; saveAndRender(); };
+    unit.value = r.unit;
+    unit.onchange = () => {
+      r.unit = unit.value;
+      qtyInput.step = stepForUnit(r.unit);
+      saveAndRender();
+    };
+
+    const minus = document.createElement('button'); minus.className = 'btn'; minus.textContent = '−';
     const plus = document.createElement('button'); plus.className='btn'; plus.textContent = '+';
-    plus.onclick = () => { r.qty = (Number(r.qty)||0) + 1; saveAndRender(); };
+
+    const qtyInput = document.createElement('input');
+    qtyInput.type='number'; qtyInput.inputMode='decimal'; qtyInput.min='0';
+    qtyInput.step = stepForUnit(r.unit);
+    qtyInput.value = r.qty;
+
+    minus.onclick = () => {
+      const step = stepForUnit(r.unit);
+      r.qty = Math.max(0, (Number(r.qty)||0) - step);
+      // Autoblokada pakowania przy zejściu do 0
+      if ((Number(r.qty)||0) <= 0 && r.pack) r.pack = false;
+      saveAndRender();
+    };
+    plus.onclick = () => {
+      const step = stepForUnit(r.unit);
+      r.qty = (Number(r.qty)||0) + step;
+      saveAndRender();
+    };
+    qtyInput.oninput = () => {
+      r.qty = qtyInput.value;
+      // Jeśli ilość 0, wymuś pakowanie = NIE
+      if ((Number(r.qty)||0) <= 0 && r.pack) r.pack = false;
+      saveAndRender();
+    };
+
     qty.appendChild(minus); qty.appendChild(qtyInput); qty.appendChild(unit); qty.appendChild(plus);
 
-    // Pakowanie próżniowe
-    const pack = document.createElement('label');
-    pack.className = 'pack';
-    const packChk = document.createElement('input'); packChk.type='checkbox'; packChk.checked = !!r.pack;
-    packChk.onchange = () => { r.pack = packChk.checked; saveAndRender(); };
-    const packTxt = document.createElement('span'); packTxt.textContent = `Pakowanie próżniowe (+${PLN.format(VAC_PRICE)})`;
-    pack.appendChild(packChk); pack.appendChild(packTxt);
+    // Pakowanie próżniowe (select TAK/NIE z blokadą przy qty=0)
+    const hasQty = (Number(r.qty)||0) > 0;
+    const packWrap = document.createElement('div');
+    packWrap.className = 'pack';
+    const packLabel = document.createElement('div'); packLabel.className = 'label';
+    packLabel.textContent = `Pakowanie próżniowe (+${PLN.format(VAC_PRICE)})`;
+    const packSelect = document.createElement('select');
+
+    const optNo = document.createElement('option'); optNo.value='NIE'; optNo.textContent='NIE';
+    const optYes = document.createElement('option'); optYes.value='TAK'; optYes.textContent='TAK';
+    optYes.disabled = !hasQty; // blokada jeśli ilość = 0
+
+    packSelect.appendChild(optNo);
+    packSelect.appendChild(optYes);
+
+    // Jeżeli qty=0 i pack był włączony, wymuś 'NIE'
+    if (!hasQty && r.pack) r.pack = false;
+    packSelect.value = r.pack ? 'TAK' : 'NIE';
+
+    packSelect.onchange = () => {
+      if (packSelect.value === 'TAK' && (Number(r.qty)||0) <= 0) {
+        // Ochrona: nie pozwalaj na wybór TAK przy ilości 0
+        packSelect.value = 'NIE';
+        return;
+      }
+      r.pack = (packSelect.value === 'TAK');
+      saveAndRender();
+    };
+
+    packWrap.appendChild(packLabel);
+    packWrap.appendChild(packSelect);
 
     // Usuń (dla pozycji własnych)
     const actions = document.createElement('div');
@@ -267,7 +305,7 @@ function render() {
 
     card.appendChild(nameWrap);
     card.appendChild(qty);
-    card.appendChild(pack);
+    card.appendChild(packWrap);
     if (r.id.startsWith('custom-')) card.appendChild(actions);
 
     els.list.appendChild(card);
@@ -276,8 +314,8 @@ function render() {
   // Totals & summary
   const totalQty = state.rows.reduce((s,r)=> s + (Number(r.qty)||0), 0);
   const itemsTotal = state.rows.reduce((s,r)=> {
-    const q = Number(r.qty)||0; const price = rowPrice(r); const u = rowUnit(r);
-    if (!price || q<=0) return s; // brak ceny = nie liczymy wartości
+    const q = Number(r.qty)||0; const price = rowPrice(r);
+    if (!price || q<=0) return s;
     return s + (price * q);
   }, 0);
   const packCount = state.rows.filter(r => (Number(r.qty)||0) > 0 && r.pack).length;
@@ -305,7 +343,7 @@ function buildSummary(itemsTotal, packCount, packTotal, grand) {
   lines.push('Pozycje:');
   state.rows.forEach(r => {
     const q = Number(r.qty)||0; if (q<=0) return;
-    const price = rowPrice(r); const u = rowUnit(r);
+    const price = rowPrice(r);
     const line = price ? `• ${r.name} — ${q} ${r.unit} × ${PLN.format(price)} = ${PLN.format(price*q)}` : `• ${r.name} — ${q} ${r.unit}`;
     lines.push(line + (r.pack ? ` [pakowanie +${PLN.format(VAC_PRICE)}]` : ''));
   });
@@ -332,7 +370,7 @@ function exportCSV() {
   const lines = [header.join(',')];
   state.rows.forEach(r => {
     const q = Number(r.qty)||0; if (q<=0) return;
-    const price = rowPrice(r); const u = rowUnit(r);
+    const price = rowPrice(r);
     const lineSum = price ? (price*q + (r.pack?VAC_PRICE:0)) : '';
     lines.push([
       r.name,
@@ -374,7 +412,7 @@ document.getElementById('btn-email').onclick = (e) => { e.currentTarget.href = t
 document.getElementById('btn-wa').onclick = (e) => { e.currentTarget.href = toWhatsAppHref(); };
 document.getElementById('btn-sms').onclick = (e) => { e.currentTarget.href = toSMSHref(); };
 
-// Nowe: zbiorcze ustawianie pakowania próżniowego
+// Zbiorcze ustawianie pakowania próżniowego
 document.getElementById('btn-pack-all').onclick = () => {
   state.rows.forEach(r => { if ((Number(r.qty)||0) > 0) r.pack = true; });
   saveAndRender();
