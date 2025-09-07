@@ -30,6 +30,7 @@
   .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:14px 16px;border-radius:14px;border:1px solid #2a3648;background:var(--btn);color:var(--text);text-decoration:none;cursor:pointer;min-height:48px}
   .btn.primary{background:linear-gradient(180deg,#f59e0b,#f59e0b 60%,#d97706);color:#111;border-color:#f59e0b}
   .btn.ghost{background:transparent}
+  .btn.small{padding:8px 10px;min-height:36px;font-size:12px;border-radius:10px}
   .actions-bottom{position:sticky;bottom:0;z-index:10;background:rgba(17,24,39,.96);backdrop-filter:blur(8px);border-top:1px solid #1f2937;padding:10px 12px}
   .actions-grid{display:grid;gap:8px;grid-template-columns:1fr 1fr}
   @media (min-width:560px){.actions-grid{grid-template-columns:repeat(6,1fr)}}
@@ -44,6 +45,7 @@
   .product .name strong{font-size:14px}
   .price{font-size:12px;color:var(--muted)}
   .pack{display:flex;align-items:center;gap:8px;font-size:12px;color:#cfe5d9}
+  .pack-controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
 </style>
 </head>
 <body>
@@ -66,7 +68,13 @@
         <input id="cust-date" type="date" placeholder="Data odbioru" />
         <textarea id="cust-notes" placeholder="Uwagi do zamówienia (np. grubość, przyprawy)"></textarea>
       </div>
-      <div class="muted" style="margin-top:6px;">Pakowanie próżniowe możliwe za dopłatą: <strong>1,50 zł</strong> za każdą pozycję z zaznaczeniem opcji.</div>
+      <div class="muted" style="margin-top:6px;">
+        Pakowanie próżniowe możliwe za dopłatą: <strong>1,50 zł</strong> za każdą pozycję z zaznaczeniem opcji.
+        <div class="pack-controls">
+          <button class="btn small" id="btn-pack-all">Zaznacz pakowanie dla wszystkich z ilością</button>
+          <button class="btn small ghost" id="btn-pack-clear">Odznacz pakowanie wszędzie</button>
+        </div>
+      </div>
     </div>
 
     <div class="card">
@@ -77,7 +85,13 @@
           <input id="search" placeholder="Szukaj produktu…" />
         </div>
       </div>
-      <div class="muted" style="margin-top:6px;">Mini cennik: Szynka/Karczek/Schab/Boczek <b>47 zł/kg</b> · Polędwiczka <b>25 zł/szt</b> · Indyk <b>25 zł/szt</b> · Pasztet <b>20 zł/foremka</b> · Krupniok <b>18 zł/kg</b> · Serki <b>10 zł/szt</b> · Makrela wędzona <b>20 zł/szt</b>.</div>
+      <div class="muted" style="margin-top:6px;">
+        Mini cennik: Szynka/Karczek/Schab/Boczek <b>47 zł/kg</b> ·
+        Kiełbasa biała <b>35 zł/kg</b> · Kiełbasa wędzona <b>37 zł/kg</b> ·
+        Polędwiczka <b>25 zł/szt</b> · Pasztet <b>20 zł/szt</b> · Salceson <b>35 zł/kg</b> ·
+        Serki (bez przypraw / czarnuszka / pomidory-bazylia / czosnek / curry / chilli) <b>10 zł/szt</b> ·
+        Makrela <b>22 zł/szt</b> · Śledź <b>20 zł/szt</b> · Łosoś <b>55 zł/kg</b> · Krupniok <b>18 zł/kg</b>.
+      </div>
       <div id="product-list" class="grid" style="gap:10px; margin-top:8px;"></div>
       <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-top:10px;">
         <span class="pill">Razem ilość: <b id="total-qty">0</b></span>
@@ -120,12 +134,28 @@ const PRICE_LIST = [
   { name: "Karczek wędzony", unit: "kg", price: 47.00 },
   { name: "Schab wędzony", unit: "kg", price: 47.00 },
   { name: "Boczek wędzony", unit: "kg", price: 47.00 },
-  { name: "Polędwiczka (szt.)", unit: "szt", price: 25.00 },
-  { name: "Indyk (szt.)", unit: "szt", price: 25.00 },
-  { name: "Pasztet (foremka)", unit: "szt", price: 20.00 },
+
+  { name: "Polędwiczka wieprzowa", unit: "szt", price: 25.00 },
+
+  { name: "Kiełbasa biała parzona", unit: "kg", price: 35.00 },
+  { name: "Kiełbasa wędzona", unit: "kg", price: 37.00 },
+
+  { name: "Pasztet", unit: "szt", price: 20.00 },
+  { name: "Salceson", unit: "kg", price: 35.00 },
+
+  { name: "Ser bez przypraw", unit: "szt", price: 10.00 },
+  { name: "Ser z czarnuszką", unit: "szt", price: 10.00 },
+  { name: "Ser z pomidorami i bazylią", unit: "szt", price: 10.00 },
+  { name: "Ser z czosnkiem", unit: "szt", price: 10.00 },
+  { name: "Ser z przyprawą curry", unit: "szt", price: 10.00 },
+  { name: "Ser z chilli", unit: "szt", price: 10.00 },
+
+  { name: "Ryby wędzone — makrela", unit: "szt", price: 22.00 },
+  { name: "Ryby wędzone — śledź", unit: "szt", price: 20.00 },
+  { name: "Ryby wędzone — łosoś", unit: "kg", price: 55.00 },
+
   { name: "Krupniok (kaszanka)", unit: "kg", price: 18.00 },
-  { name: "Serki", unit: "szt", price: 10.00 },
-  { name: "Makrela wędzona", unit: "szt", price: 20.00 },
+  { name: "Indyk (szt.)", unit: "szt", price: 25.00 }
 ];
 const VAC_PRICE = 1.50; // dopłata za pakowanie próżniowe (za pozycję)
 const PLN = new Intl.NumberFormat('pl-PL', { style:'currency', currency:'PLN' });
@@ -328,6 +358,16 @@ document.getElementById('btn-csv').onclick = exportCSV;
 document.getElementById('btn-email').onclick = (e) => { e.currentTarget.href = toEmailHref(); };
 document.getElementById('btn-wa').onclick = (e) => { e.currentTarget.href = toWhatsAppHref(); };
 document.getElementById('btn-sms').onclick = (e) => { e.currentTarget.href = toSMSHref(); };
+
+// Nowe: zbiorcze ustawianie pakowania próżniowego
+document.getElementById('btn-pack-all').onclick = () => {
+  state.rows.forEach(r => { if ((Number(r.qty)||0) > 0) r.pack = true; });
+  saveAndRender();
+};
+document.getElementById('btn-pack-clear').onclick = () => {
+  state.rows.forEach(r => { r.pack = false; });
+  saveAndRender();
+};
 
 // Inputs binding
 ['cust-name','cust-phone','cust-email','cust-date','cust-notes','search'].forEach(id => { document.getElementById(id).addEventListener('input', render); });
