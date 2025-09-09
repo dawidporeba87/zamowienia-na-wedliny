@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Wędliny z Druciarni — Zamówienia (Mobile v3)</title>
+<title>Wędliny z Druciarni — Zamówienia (Mobile v4)</title>
 <meta name="theme-color" content="#0b0f1a">
 <style>
   :root{
@@ -12,84 +12,548 @@
   }
   *{box-sizing:border-box}
   html,body{height:100%}
-  body{margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; background:var(--bg); color:var(--text);}
-  .topbar{position:sticky; top:0; z-index:20; display:flex; align-items:center; gap:12px; padding:14px 16px;
-          background:linear-gradient(180deg, rgba(11,15,26,.96), rgba(11,15,26,.86)); backdrop-filter:saturate(180%) blur(10px); border-bottom:1px solid var(--border);}
+  body{
+    margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    background:var(--bg); color:var(--text);
+  }
+
+  /* Topbar */
+  .topbar{
+    position:sticky; top:0; z-index:20;
+    display:flex; align-items:center; gap:12px;
+    padding:14px 16px;
+    background:linear-gradient(180deg, rgba(11,15,26,.96), rgba(11,15,26,.86));
+    backdrop-filter: saturate(180%) blur(10px);
+    border-bottom:1px solid var(--border);
+  }
   .logo{height:44px;width:auto;border-radius:12px;background:#0b0f1a;padding:6px}
   .title h1{margin:0; font-size:18px; letter-spacing:.2px}
   .title .tag{font-size:12px; color:var(--muted)}
+
   .content{padding:12px; display:grid; gap:12px; padding-bottom:24px}
-  .card{background:var(--card); border:1px solid var(--border); border-radius:18px; padding:12px; box-shadow:0 8px 30px rgba(0,0,0,.25)}
+
+  .card{
+    background:var(--card); border:1px solid var(--border);
+    border-radius:18px; padding:12px;
+    box-shadow:0 8px 30px rgba(0,0,0,.25);
+  }
   h3{margin:0 0 8px 0; font-size:16px}
+
   input,select,textarea,button{font:inherit}
-  input,select,textarea{width:100%; padding:14px 14px; border-radius:14px; border:1px solid #243049; background:#0b1220; color:var(--text)}
+  input,select,textarea{
+    width:100%; padding:14px 14px; border-radius:14px;
+    border:1px solid #243049; background:#0b1220; color:var(--text);
+  }
   textarea{min-height:92px}
+
+  /* Pills / small text */
   .muted{color:var(--muted); font-size:12px}
   .pill{display:inline-block; padding:6px 10px; border-radius:999px; background:#0b1220; border:1px solid #22304c; color:var(--muted); font-size:12px}
+
+  /* Search */
   .search{position:relative}
   .search .icon{position:absolute; left:12px; top:50%; transform:translateY(-50%); opacity:.6}
   .search input{padding-left:40px; border-radius:16px}
-  .tile{background:var(--tile); border:1px solid var(--tile-border); border-radius:16px; padding:12px; display:grid; gap:10px; box-shadow:0 6px 18px rgba(0,0,0,.25)}
-  .tile-head{display:flex; align-items:center; justify-content:space-between; gap:10px}
+
+  /* Product tile */
+  .tile{
+    background:var(--tile); border:1px solid var(--tile-border);
+    border-radius:16px; padding:12px; display:grid; gap:10px;
+    box-shadow:0 6px 18px rgba(0,0,0,.25);
+  }
+  .tile-head{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+  }
   .name{display:flex; align-items:center; gap:8px; font-weight:800; font-size:17px; color:var(--accent)}
   .price{font-size:14px; font-weight:800}
-  .badge{display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; border:2px solid var(--accent); background:#1a1f2e; color:var(--accent); font-size:12px; font-weight:800; letter-spacing:.3px}
+  .badge{
+    display:inline-flex; align-items:center; gap:6px; padding:6px 10px;
+    border-radius:999px; border:2px solid var(--accent); background:#1a1f2e;
+    color:var(--accent); font-size:12px; font-weight:800; letter-spacing:.3px
+  }
   .badge .dot{width:8px; height:8px; border-radius:50%; background:var(--accent)}
+
   .tile-body{display:grid; gap:10px}
   .row-grid{display:grid; grid-template-columns:1fr; gap:8px}
   @media (min-width:520px){ .row-grid{ grid-template-columns: 1fr 1fr } }
-  .stepper{display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:8px; background:#0b1220; border:1px solid #243049; border-radius:14px; padding:8px}
-  .stepper button{min-width:44px; min-height:44px; border-radius:12px; border:1px solid #2a3648; background:var(--btn); color:var(--text); cursor:pointer}
-  .stepper input{border:none; background:transparent; text-align:center; font-weight:700; font-size:16px; padding:8px 4px}
+
+  /* Stepper */
+  .stepper{
+    display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:8px;
+    background:#0b1220; border:1px solid #243049; border-radius:14px; padding:8px;
+  }
+  .stepper button{
+    min-width:44px; min-height:44px; border-radius:12px; border:1px solid #2a3648; background:var(--btn);
+    color:var(--text); cursor:pointer;
+  }
+  .stepper input{
+    border:none; background:transparent; text-align:center; font-weight:700; font-size:16px; padding:8px 4px
+  }
+
+  /* Switch */
   .switch{ display:inline-flex; align-items:center; gap:10px; user-select:none; }
   .switch input{display:none}
   .switch .track{ width:52px; height:30px; background:#26324b; border:1px solid #2a3a5e; border-radius:999px; position:relative; transition:.2s; }
   .switch .thumb{ position:absolute; top:50%; transform:translateY(-50%); left:4px; width:24px; height:24px; background:#e5e7eb; border-radius:50%; transition:.2s; }
   .switch input:checked + .track{ background:#f59e0b; border-color:#f59e0b }
   .switch input:checked + .track .thumb{ left:24px; background:#111 }
+
+  /* Summary */
   .summary{background:#0b1220; border:1px solid #23314e; border-radius:14px; padding:12px; white-space:pre-wrap}
+
+  /* Actions (below summary) */
   .actions{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px}
   @media (min-width:560px){ .actions{ grid-template-columns: repeat(6, 1fr) } }
-  .btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:14px 16px; border-radius:14px; border:1px solid #2a3648; background:var(--btn); color:var(--text); text-decoration:none; cursor:pointer; min-height:48px; font-weight:700}
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    padding:14px 16px; border-radius:14px; border:1px solid #2a3648; background:var(--btn);
+    color:var(--text); text-decoration:none; cursor:pointer; min-height:48px; font-weight:700;
+  }
   .btn.primary{background:linear-gradient(180deg,#f59e0b,#f59e0b 60%,#d97706); color:#111; border-color:#f59e0b}
   .btn.ghost{background:transparent}
-  .modal-backdrop{position:fixed; inset:0; background:rgba(0,0,0,.55); display:none; align-items:center; justify-content:center; z-index:50}
-  .modal{width:min(560px,92vw); background:var(--card); border:1px solid var(--border); border-radius:18px; padding:16px; box-shadow:0 20px 60px rgba(0,0,0,.55)}
-  .modal h4{margin:0 0 10px 0; font-size:16px}
-  .modal .grid{display:grid; gap:10px; grid-template-columns:1fr}
-  @media (min-width:640px){ .modal .grid{ grid-template-columns:1fr 1fr } }
-  .modal .actions{display:flex; gap:8px; justify-content:flex-end; margin-top:10px}
-  .field-note{font-size:12px; color:var(--muted); margin-top:2px}
-  .error{border-color:#dc2626!important; outline-color:#dc2626!important}
+
+  /* Helpers */
   .mini{font-size:12px; color:var(--muted)}
 </style>
 </head>
 <body>
   <div class="topbar">
     <img src="logo.png" class="logo" alt="Logo" />
-    <div class="title"><h1>Wędliny z Druciarni</h1><div class="tag">Formularz zamówień</div></div>
+    <div class="title">
+      <h1>Wędliny z Druciarni</h1>
+      <div class="tag">Formularz zamówień</div>
+    </div>
   </div>
+
   <div class="content">
-    <div class="card"><h3>Klient</h3><div class="row-grid"><input id="cust-name" placeholder="Imię i nazwisko" /><input id="cust-phone" placeholder="Telefon" inputmode="tel" /><input id="cust-email" placeholder="E-mail (opcjonalnie)" inputmode="email" /><input id="cust-date" type="date" placeholder="Data odbioru" /></div><div style="margin-top:8px"><textarea id="cust-notes" placeholder="Uwagi do zamówienia (np. grubo, ostro, przyprawy)"></textarea></div><div class="mini" style="margin-top:6px;">Pakowanie próżniowe możliwe za dopłatą: <strong>1,50 zł</strong> / pozycję.<div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;"><button class="btn" id="btn-pack-all">Zaznacz pakowanie dla wszystkich z ilością</button><button class="btn ghost" id="btn-pack-clear">Odznacz pakowanie wszędzie</button></div></div></div>
-    <div class="card"><h3>Produkty</h3><div class="search" style="margin-top:6px;"><span class="icon">🔎</span><input id="search" placeholder="Szukaj produktu…" /></div><div id="product-list" style="display:grid; gap:10px; margin-top:10px;"></div><div style="display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; margin-top:12px;"><span class="pill">Ilość pozycji: <b id="total-qty">0</b></span><span class="pill">Razem: <b id="total-sum">0,00 zł</b></span></div><div style="margin-top:12px; text-align:center;"><button id="btn-add-custom-bottom" class="btn primary">➕ Dodaj własną pozycję (do wyceny)</button></div></div>
-    <div class="card"><h3>Wysyłka</h3><div class="row-grid"><input id="dest-phone" value="48791412017" placeholder="Numer do WhatsApp/SMS (np. 48600111222)" inputmode="tel" /></div><div class="mini" style="margin-top:6px;">Numer w formacie międzynarodowym, bez spacji.</div></div>
-    <div class="card"><h3>Podsumowanie</h3><div class="summary" id="summary"></div><div class="actions"><button class="btn" id="btn-copy">Kopiuj</button><button class="btn" id="btn-csv">CSV</button><a class="btn" id="btn-email" href="#">E-mail</a><a class="btn primary" id="btn-wa" href="#" target="_blank">WhatsApp</a><a class="btn" id="btn-sms" href="#">SMS</a><button class="btn ghost" id="btn-clear">Wyczyść</button></div></div>
+    <!-- Klient -->
+    <div class="card">
+      <h3>Klient</h3>
+      <div class="row-grid">
+        <input id="cust-name" placeholder="Imię i nazwisko" />
+        <input id="cust-phone" placeholder="Telefon" inputmode="tel" />
+        <input id="cust-email" placeholder="E-mail (opcjonalnie)" inputmode="email" />
+        <input id="cust-date" type="date" placeholder="Data odbioru" />
+      </div>
+      <div style="margin-top:8px"><textarea id="cust-notes" placeholder="Uwagi do zamówienia (np. grubo, ostro, przyprawy)"></textarea></div>
+      <div class="mini" style="margin-top:6px;">
+        Pakowanie próżniowe możliwe za dopłatą: <strong>1,50 zł</strong> / pozycję.
+        <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn" id="btn-pack-all">Zaznacz pakowanie dla wszystkich z ilością</button>
+          <button class="btn ghost" id="btn-pack-clear">Odznacz pakowanie wszędzie</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Produkty -->
+    <div class="card">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+        <h3>Produkty</h3>
+        <div class="search" style="min-width:230px; flex:1">
+          <span class="icon">🔎</span>
+          <input id="search" placeholder="Szukaj produktu…" />
+        </div>
+      </div>
+      <div class="mini" style="margin-top:6px;">
+        Mini cennik: Szynka/Karczek/Schab/Boczek <b>47 zł/kg</b> ·
+        Kiełbasa biała <b>35 zł/kg</b> · Kiełbasa wędzona <b>37 zł/kg</b> ·
+        Polędwiczka <b>25 zł/szt</b> · Pasztet <b>20 zł/szt</b> · Salceson <b>35 zł/kg</b> ·
+        Serki (bez przypraw / czarnuszka / pomidory-bazylia / czosnek / curry / chilli) <b>10 zł/szt</b> ·
+        Makrela <b>22 zł/szt</b> · Śledź <b>20 zł/szt</b> · Łosoś <b>55 zł/kg</b> · Krupniok <b>18 zł/kg</b>.
+      </div>
+      <div id="product-list" style="display:grid; gap:10px; margin-top:10px;"></div>
+
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; margin-top:12px;">
+        <span class="pill">Ilość pozycji: <b id="total-qty">0</b></span>
+        <span class="pill">Razem: <b id="total-sum">0,00 zł</b></span>
+      </div>
+
+      <div style="margin-top:12px; text-align:center;">
+        <button id="btn-add-custom-bottom" class="btn primary">➕ Dodaj własną pozycję (do wyceny)</button>
+      </div>
+    </div>
+
+    <!-- Wysyłka -->
+    <div class="card">
+      <h3>Wysyłka</h3>
+      <div class="row-grid">
+        <input id="dest-phone" value="48791412017" placeholder="Numer do WhatsApp/SMS (np. 48600111222)" inputmode="tel" />
+      </div>
+      <div class="mini" style="margin-top:6px;">Numer w formacie międzynarodowym, bez spacji.</div>
+    </div>
+
+    <!-- Podsumowanie + Actions under it -->
+    <div class="card">
+      <h3>Podsumowanie</h3>
+      <div class="summary" id="summary"></div>
+      <div class="actions">
+        <button class="btn" id="btn-copy">Kopiuj</button>
+        <button class="btn" id="btn-csv">CSV</button>
+        <a class="btn" id="btn-email" href="#">E-mail</a>
+        <a class="btn primary" id="btn-wa" href="#" target="_blank">WhatsApp</a>
+        <a class="btn" id="btn-sms" href="#">SMS</a>
+        <button class="btn ghost" id="btn-clear">Wyczyść</button>
+      </div>
+    </div>
   </div>
-  <script>
-  const VAC_PRICE=1.5;
-  const PRICES={'Szynka wędzona':{value:47,unit:'kg'},'Schab wędzony':{value:47,unit:'kg'},'Boczek wędzony':{value:47,unit:'kg'},'Karczek wędzony':{value:47,unit:'kg'},'Kiełbasa biała parzona':{value:35,unit:'kg'},'Kiełbasa wędzona':{value:37,unit:'kg'},'Polędwiczka wieprzowa':{value:25,unit:'szt'},'Pasztet':{value:20,unit:'szt'},'Salceson':{value:35,unit:'kg'},'Ser bez przypraw':{value:10,unit:'szt'},'Ser z czarnuszką':{value:10,unit:'szt'},'Ser z pomidorami i bazylią':{value:10,unit:'szt'},'Ser z czosnkiem':{value:10,unit:'szt'},'Ser z przyprawą curry':{value:10,unit:'szt'},'Ser z chilli':{value:10,unit:'szt'},'Makrela wędzona':{value:22,unit:'szt'},'Śledź wędzony':{value:20,unit:'szt'},'Łosoś wędzony':{value:55,unit:'kg'},'Krupniok (kaszanka)':{value:18,unit:'kg'}};
-  const BASE_PRODUCTS=Object.keys(PRICES).map(name=>{const p=PRICES[name];return{id:'p-'+name.toLowerCase().replace(/[^a-z0-9]+/g,'-'),name,unit:p.unit,price:p.value,pack:false,qty:0,notes:''}});
-  let state={rows:[],filter:''};
-  function loadState(){try{const s=JSON.parse(localStorage.getItem('wd-state-v3')||'null');if(s&&Array.isArray(s.rows)){state.rows=s.rows;}else{state.rows=[...BASE_PRODUCTS];}state.filter=s?.filter||'';}catch(e){state.rows=[...BASE_PRODUCTS];}}
-  function saveState(){localStorage.setItem('wd-state-v3',JSON.stringify({rows:state.rows,filter:state.filter}));}
-  function saveAndRender(){saveState();render();}
-  const listEl=document.getElementById('product-list');const totalQtyEl=document.getElementById('total-qty');const totalSumEl=document.getElementById('total-sum');const summaryEl=document.getElementById('summary');
-  function formatPrice(v){return(v||0).toFixed(2).replace('.',',')+' zł';}
-  function parseQty(val){return Math.max(0,parseFloat((''+val).replace(',','.'))||0);}
-  function makeTile(row){const el=document.createElement('div');el.className='tile';const head=document.createElement('div');head.className='tile-head';const nameWrap=document.createElement('div');nameWrap.className='name';const title=document.createElement('span');title.textContent=row.name;nameWrap.appendChild(title);const price=document.createElement('div');price.className='price';price.textContent=(typeof row.price==='number'&&row.price>0)?(row.price+' zł/'+row.unit):'—';head.appendChild(nameWrap);head.appendChild(price);const body=document.createElement('div');body.className='tile-body';const stepper=document.createElement('div');stepper.className='stepper';const minus=document.createElement('button');minus.type='button';minus.textContent='–';const qty=document.createElement('input');qty.type='number';qty.step='0.01';qty.placeholder=row.unit==='kg'?'kg':'szt';qty.value=row.qty>0?row.qty:'';const plus=document.createElement('button');plus.type='button';plus.textContent='+';function updateQty(v){row.qty=Math.max(0,Math.round(v*100)/100);qty.value=row.qty||'';saveAndRender();}minus.addEventListener('click',()=>updateQty(parseQty(qty.value||0)-(row.unit==='kg'?0.5:1)));plus.addEventListener('click',()=>updateQty(parseQty(qty.value||0)+(row.unit==='kg'?0.5:1)));qty.addEventListener('input',()=>{row.qty=parseQty(qty.value);saveAndRender();});stepper.appendChild(minus);stepper.appendChild(qty);stepper.appendChild(plus);body.appendChild(stepper);el.appendChild(head);el.appendChild(body);return el;}
-  function render(){const q=(state.filter||'').trim().toLowerCase();const rows=state.rows.filter(r=>!q||r.name.toLowerCase().includes(q));listEl.innerHTML='';rows.forEach(r=>listEl.appendChild(makeTile(r)));let totalQty=0,total=0,vacCount=0;const ordered=state.rows.filter(r=>r.qty>0);ordered.forEach(r=>{totalQty+=r.qty;if(typeof r.price==='number'&&r.price>0)total+=r.qty*r.price;if(r.pack)vacCount+=1;});const vacCost=vacCount*VAC_PRICE;const grand=total+vacCost;totalQtyEl.textContent=(Math.round(totalQty*100)/100).toString().replace('.',',');totalSumEl.textContent=formatPrice(grand);const lines=[];lines.push('Zamówienie:');if(ordered.length===0){lines.push('— (brak pozycji)');}else{ordered.forEach(r=>{lines.push('• '+r.name+': '+r.qty+' '+r.unit);});}summaryEl.textContent=lines.join('\n');}
-  document.getElementById('search').addEventListener('input',e=>{state.filter=e.target.value;saveAndRender();});
-  loadState();render();
-  </script>
+
+  <!-- Modal: własna pozycja -->
+  <div class="modal-backdrop" id="modal-custom">
+    <div class="modal">
+      <h4>Dodaj własną pozycję (do wyceny)</h4>
+      <div class="grid">
+        <div style="grid-column:1/-1">
+          <label for="custom-name" class="field-note">Nazwa (wymagane, 3–60 znaków)</label>
+          <input id="custom-name" maxlength="60" placeholder="np. Szynka specjalna" />
+        </div>
+        <div>
+          <label for="custom-qty" class="field-note">Ilość (wymagane, &gt; 0)</label>
+          <input id="custom-qty" type="number" step="0.01" inputmode="decimal" placeholder="np. 1" />
+        </div>
+        <div>
+          <label for="custom-unit" class="field-note">Jednostka</label>
+          <select id="custom-unit">
+            <option value="kg">kg</option>
+            <option value="szt">szt</option>
+          </select>
+        </div>
+        <div style="grid-column:1/-1">
+          <label for="custom-notes" class="field-note">Uwagi (opcjonalnie)</label>
+          <input id="custom-notes" placeholder="np. grubo mielone, lekko pikantne" />
+        </div>
+      </div>
+      <div class="actions" style="margin-top:10px; justify-content:flex-end; display:flex;">
+        <button class="btn ghost" id="custom-cancel">Anuluj</button>
+        <button class="btn primary" id="custom-save">Dodaj pozycję</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+// === KONFIG ===
+const VAC_PRICE = 1.5;
+const KG_STEP = 0.5; // <== żądany skok dla kg
+const PRICES = {
+  'Szynka wędzona': { value: 47, unit: 'kg' },
+  'Schab wędzony': { value: 47, unit: 'kg' },
+  'Boczek wędzony': { value: 47, unit: 'kg' },
+  'Karczek wędzony': { value: 47, unit: 'kg' },
+  'Kiełbasa biała parzona': { value: 35, unit: 'kg' },
+  'Kiełbasa wędzona': { value: 37, unit: 'kg' },
+  'Polędwiczka wieprzowa': { value: 25, unit: 'szt' },
+  'Pasztet': { value: 20, unit: 'szt' },
+  'Salceson': { value: 35, unit: 'kg' },
+  'Ser bez przypraw': { value: 10, unit: 'szt' },
+  'Ser z czarnuszką': { value: 10, unit: 'szt' },
+  'Ser z pomidorami i bazylią': { value: 10, unit: 'szt' },
+  'Ser z czosnkiem': { value: 10, unit: 'szt' },
+  'Ser z przyprawą curry': { value: 10, unit: 'szt' },
+  'Ser z chilli': { value: 10, unit: 'szt' },
+  'Makrela wędzona': { value: 22, unit: 'szt' },
+  'Śledź wędzony': { value: 20, unit: 'szt' },
+  'Łosoś wędzony': { value: 55, unit: 'kg' },
+  'Krupniok (kaszanka)': { value: 18, unit: 'kg' }
+};
+const BASE_PRODUCTS = Object.keys(PRICES).map((name) => {
+  const p = PRICES[name];
+  return { id: 'p-' + name.toLowerCase().replace(/[^a-z0-9]+/g,'-'), name, unit: p.unit, price: p.value, pack:false, qty: 0, notes:'' };
+});
+
+// === STAN ===
+let state = { rows: [], filter: '' };
+
+function loadState(){
+  try{
+    const s = JSON.parse(localStorage.getItem('wd-state-v3')||'null');
+    if(s && Array.isArray(s.rows)){ state.rows = s.rows; } else { state.rows = [...BASE_PRODUCTS]; }
+    state.filter = s?.filter || '';
+  }catch(e){ state.rows = [...BASE_PRODUCTS]; }
+}
+function saveState(){ localStorage.setItem('wd-state-v3', JSON.stringify({ rows: state.rows, filter: state.filter })); }
+function saveAndRender(){ saveState(); render(); }
+
+// === ELEMENTY ===
+const listEl = document.getElementById('product-list');
+const totalQtyEl = document.getElementById('total-qty');
+const totalSumEl = document.getElementById('total-sum');
+const summaryEl = document.getElementById('summary');
+
+function formatPrice(v){ return (v||0).toFixed(2).replace('.', ',') + ' zł'; }
+function parseQty(val){ return Math.max(0, parseFloat((''+val).replace(',', '.')) || 0); }
+
+function makeTile(row){
+  const el = document.createElement('div');
+  el.className = 'tile';
+
+  const head = document.createElement('div');
+  head.className = 'tile-head';
+
+  const nameWrap = document.createElement('div');
+  nameWrap.className = 'name';
+  const title = document.createElement('span');
+  title.textContent = row.name;
+  nameWrap.appendChild(title);
+  if(!(typeof row.price === 'number' && row.price>0)){
+    const badge = document.createElement('span');
+    badge.className = 'badge';
+    badge.innerHTML = '<span class="dot"></span> DO WYCENY';
+    nameWrap.appendChild(badge);
+  }
+  const price = document.createElement('div');
+  price.className = 'price';
+  price.textContent = (typeof row.price === 'number' && row.price>0) ? (row.price + ' zł/' + row.unit) : '—';
+
+  head.appendChild(nameWrap);
+  head.appendChild(price);
+
+  const body = document.createElement('div');
+  body.className = 'tile-body';
+
+  // Stepper ilości
+  const stepper = document.createElement('div');
+  stepper.className = 'stepper';
+  const minus = document.createElement('button');
+  minus.type = 'button'; minus.textContent = '–';
+  const qty = document.createElement('input');
+  qty.type = 'number'; qty.step = '0.01'; // ręczny wpis z dokładnością
+  qty.placeholder = row.unit==='kg'?'kg':'szt'; qty.value = row.qty>0?row.qty:'';
+  const plus = document.createElement('button');
+  plus.type = 'button'; plus.textContent = '+';
+
+  function updateQty(v){
+    // zaokrąglenie do 0.5 dla kg, do 1 dla sztuk
+    const step = row.unit==='kg' ? KG_STEP : 1;
+    const rounded = row.unit==='kg' ? Math.round(v/step)*step : Math.round(v/step)*step;
+    row.qty = Math.max(0, +(rounded.toFixed(2)));
+    qty.value = row.qty || '';
+    saveAndRender();
+  }
+  minus.addEventListener('click', ()=> {
+    const step = row.unit==='kg' ? KG_STEP : 1;
+    updateQty(parseQty(qty.value||0) - step);
+  });
+  plus.addEventListener('click', ()=> {
+    const step = row.unit==='kg' ? KG_STEP : 1;
+    updateQty(parseQty(qty.value||0) + step);
+  });
+  qty.addEventListener('input', ()=>{ row.qty = parseQty(qty.value); saveAndRender(); });
+
+  stepper.appendChild(minus); stepper.appendChild(qty); stepper.appendChild(plus);
+
+  // Switch pakowania + uwagi
+  const grid = document.createElement('div');
+  grid.className = 'row-grid';
+
+  const packWrap = document.createElement('label');
+  packWrap.className = 'switch';
+  const packInput = document.createElement('input'); packInput.type='checkbox'; packInput.checked=!!row.pack;
+  const track = document.createElement('span'); track.className='track';
+  const thumb = document.createElement('span'); thumb.className='thumb';
+  track.appendChild(thumb);
+  packInput.addEventListener('change', ()=>{ row.pack = packInput.checked; saveAndRender(); });
+  const packText = document.createElement('span'); packText.className='mini'; packText.textContent = 'Pakowanie próżniowe (+1,50 zł)';
+  packWrap.appendChild(packInput); packWrap.appendChild(track); packWrap.appendChild(packText);
+
+  const notes = document.createElement('input');
+  notes.placeholder = 'Uwagi (opcjonalnie)';
+  notes.value = row.notes || '';
+  notes.addEventListener('input', ()=>{ row.notes = notes.value; saveState(); });
+
+  grid.appendChild(packWrap);
+  grid.appendChild(notes);
+
+  body.appendChild(stepper);
+  body.appendChild(grid);
+
+  el.appendChild(head);
+  el.appendChild(body);
+  return el;
+}
+
+function render(){
+  const q = (state.filter||'').trim().toLowerCase();
+  const rows = state.rows.filter(r => !q || r.name.toLowerCase().includes(q));
+
+  listEl.innerHTML = '';
+  rows.forEach(r => listEl.appendChild(makeTile(r)));
+
+  // Sumy
+  let totalQty = 0, total = 0, vacCount = 0;
+  const ordered = state.rows.filter(r => r.qty > 0);
+  ordered.forEach(r => {
+    totalQty += r.qty;
+    if(typeof r.price === 'number' && r.price > 0) total += r.qty * r.price;
+    if(r.pack) vacCount += 1;
+  });
+  const vacCost = vacCount * VAC_PRICE;
+  const grand = total + vacCost;
+
+  totalQtyEl.textContent = (Math.round(totalQty*100)/100).toString().replace('.', ',');
+  totalSumEl.textContent = formatPrice(grand);
+
+  // Podsumowanie
+  const lines = [];
+  const custName = (document.getElementById('cust-name').value||'').trim();
+  const custPhone = (document.getElementById('cust-phone').value||'').trim();
+  const custEmail = (document.getElementById('cust-email').value||'').trim();
+  const custDate = (document.getElementById('cust-date').value||'').trim();
+  const custNotes = (document.getElementById('cust-notes').value||'').trim();
+
+  if(custName) lines.push('Klient: ' + custName);
+  if(custPhone) lines.push('Telefon: ' + custPhone);
+  if(custEmail) lines.push('E-mail: ' + custEmail);
+  if(custDate) lines.push('Data odbioru: ' + custDate);
+  if(custNotes) lines.push('Uwagi: ' + custNotes);
+  if(lines.length) lines.push('');
+
+  lines.push('Zamówienie:');
+  if(ordered.length === 0){
+    lines.push('— (brak pozycji)');
+  } else {
+    ordered.forEach(r => {
+      const base = `${r.name}: ${r.qty} ${r.unit}`;
+      const priceInfo = (typeof r.price === 'number' && r.price > 0) ? ` @ ${r.price} zł/${r.unit}` : ' (do wyceny)';
+      const bits = [base + priceInfo];
+      if(r.pack) bits.push('[pakowanie +1,50 zł]');
+      if(r.notes) bits.push(`[uwagi: ${r.notes}]`);
+      lines.push('• ' + bits.join(' '));
+    });
+  }
+  lines.push('');
+  lines.push(`Suma produktów: ${formatPrice(total)}`);
+  lines.push(`Pakowanie: ${vacCount} × ${formatPrice(VAC_PRICE)} = ${formatPrice(vacCost)}`);
+  lines.push(`RAZEM: ${formatPrice(grand)}`);
+
+  summaryEl.textContent = lines.join('\n');
+}
+
+// === Wyszukiwarka ===
+document.getElementById('search').addEventListener('input', (e)=>{
+  state.filter = e.target.value;
+  saveAndRender();
+});
+
+// === Pakowanie zbiorcze ===
+document.getElementById('btn-pack-all').addEventListener('click', ()=>{
+  state.rows.forEach(r => { if(r.qty > 0) r.pack = true; });
+  saveAndRender();
+});
+document.getElementById('btn-pack-clear').addEventListener('click', ()=>{
+  state.rows.forEach(r => { r.pack = false; });
+  saveAndRender();
+});
+
+// === Export / udostępnianie ===
+function getSummaryText(){ return document.getElementById('summary').textContent; }
+function encodeText(t){ return encodeURIComponent(t).replace(/%20/g,'+'); }
+function prepMessage(){ return getSummaryText(); }
+
+document.getElementById('btn-copy').addEventListener('click', async ()=>{
+  try{ await navigator.clipboard.writeText(getSummaryText()); alert('Skopiowano podsumowanie do schowka.'); }
+  catch(e){ alert('Nie udało się skopiować. Skopiuj ręcznie z sekcji Podsumowanie.'); }
+});
+
+document.getElementById('btn-csv').addEventListener('click', ()=>{
+  const rows = [['Nazwa','Ilość','Jednostka','Cena jednostkowa','Pakowanie','Uwagi']];
+  state.rows.filter(r => r.qty > 0).forEach(r => {
+    rows.push([
+      r.name,
+      String(r.qty).replace('.',','),
+      r.unit,
+      (typeof r.price === 'number' && r.price > 0) ? (String(r.price).replace('.',',')+' zł/'+r.unit) : 'do wyceny',
+      r.pack ? 'tak' : 'nie',
+      r.notes || ''
+    ]);
+  });
+  const csv = rows.map(r => r.map(v => '"'+String(v).replaceAll('"','""')+'"').join(';')).join('\r\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'zamowienie.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+});
+
+document.getElementById('btn-email').addEventListener('click', (e)=>{
+  const subject = 'Zamówienie — Wędliny z Druciarni';
+  const body = prepMessage();
+  e.currentTarget.href = 'mailto:?subject=' + encodeText(subject) + '&body=' + encodeText(body);
+});
+
+document.getElementById('btn-wa').addEventListener('click', (e)=>{
+  const num = (document.getElementById('dest-phone').value||'').replace(/\D+/g,'');
+  const text = prepMessage();
+  e.currentTarget.href = 'https://wa.me/' + num + '?text=' + encodeText(text);
+});
+
+document.getElementById('btn-sms').addEventListener('click', (e)=>{
+  const num = (document.getElementById('dest-phone').value||'').replace(/\D+/g,'');
+  const text = prepMessage();
+  e.currentTarget.href = 'sms:' + num + '?&body=' + encodeText(text);
+});
+
+document.getElementById('btn-clear').addEventListener('click', ()=>{
+  if(!confirm('Na pewno wyczyścić formularz?')) return;
+  localStorage.removeItem('wd-state-v3');
+  state.rows = [...BASE_PRODUCTS];
+  document.getElementById('cust-name').value = '';
+  document.getElementById('cust-phone').value = '';
+  document.getElementById('cust-email').value = '';
+  document.getElementById('cust-date').value = '';
+  document.getElementById('cust-notes').value = '';
+  render();
+});
+
+// === Modal własna pozycja ===
+function openCustomModal(){ modal.open(); }
+const modal = {
+  el: document.getElementById('modal-custom'),
+  name: null, qty: null, unit: null, notes: null,
+  open(){
+    this.name = document.getElementById('custom-name');
+    this.qty = document.getElementById('custom-qty');
+    this.unit = document.getElementById('custom-unit');
+    this.notes = document.getElementById('custom-notes');
+    this.name.value = '';
+    this.qty.value = '';
+    this.unit.value = 'kg';
+    this.notes.value = '';
+    this.clearErrors();
+    this.el.style.display = 'flex';
+    setTimeout(()=> this.name.focus(), 0);
+  },
+  close(){ this.el.style.display = 'none'; },
+  clearErrors(){ [this.name,this.qty].forEach(i=> i && i.classList.remove('error')); },
+  validate(){
+    this.clearErrors();
+    const n = (this.name.value||'').trim();
+    const q = parseFloat((this.qty.value||'').replace(',', '.'));
+    let ok = true;
+    if (n.length < 3 || n.length > 60){ this.name.classList.add('error'); ok = false; }
+    if (!(q > 0)){ this.qty.classList.add('error'); ok = false; }
+    return ok ? { name:n, qty:q, unit:this.unit.value, notes:(this.notes.value||'').trim() } : null;
+  }
+};
+function closeCustomModal(){ modal.close(); }
+document.getElementById('custom-cancel').addEventListener('click', closeCustomModal);
+document.getElementById('modal-custom').addEventListener('click', (e)=>{
+  if (e.target === document.getElementById('modal-custom')) closeCustomModal();
+});
+document.getElementById('custom-save').addEventListener('click', ()=>{
+  const data = modal.validate(); if (!data) return;
+  const id = 'custom-' + Date.now().toString(36);
+  state.rows.push({ id, name: data.name, qty: data.qty, unit: data.unit, price: undefined, pack:false, notes:data.notes });
+  saveAndRender(); closeCustomModal();
+});
+document.getElementById('btn-add-custom-bottom').addEventListener('click', openCustomModal);
+
+// === Init ===
+loadState();
+render();
+
+// Aktualizacje na zmiany klienta
+['cust-name','cust-phone','cust-email','cust-date','cust-notes'].forEach(id=>{
+  const el = document.getElementById(id);
+  el.addEventListener('input', ()=> { saveState(); render(); });
+});
+</script>
 </body>
 </html>
