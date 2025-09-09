@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Wędliny z Druciarni — Zamówienia (Mobile v4)</title>
+<title>Wędliny z Druciarni — Zamówienia (Mobile v5)</title>
 <meta name="theme-color" content="#0b0f1a">
 <style>
   :root{
@@ -112,6 +112,16 @@
   .btn.primary{background:linear-gradient(180deg,#f59e0b,#f59e0b 60%,#d97706); color:#111; border-color:#f59e0b}
   .btn.ghost{background:transparent}
 
+  /* Modal */
+  .modal-backdrop{position:fixed; inset:0; background:rgba(0,0,0,.55); display:none; align-items:center; justify-content:center; z-index:50}
+  .modal{width:min(560px,92vw); background:var(--card); border:1px solid var(--border); border-radius:18px; padding:16px; box-shadow:0 20px 60px rgba(0,0,0,.55)}
+  .modal h4{margin:0 0 10px 0; font-size:16px}
+  .modal .grid{display:grid; gap:10px; grid-template-columns:1fr}
+  @media (min-width:640px){ .modal .grid{ grid-template-columns:1fr 1fr } }
+  .modal .actions{display:flex; gap:8px; justify-content:flex-end; margin-top:10px}
+  .field-note{font-size:12px; color:var(--muted); margin-top:2px}
+  .error{border-color:#dc2626!important; outline-color:#dc2626!important}
+
   /* Helpers */
   .mini{font-size:12px; color:var(--muted)}
 </style>
@@ -159,7 +169,8 @@
         Kiełbasa biała <b>35 zł/kg</b> · Kiełbasa wędzona <b>37 zł/kg</b> ·
         Polędwiczka <b>25 zł/szt</b> · Pasztet <b>20 zł/szt</b> · Salceson <b>35 zł/kg</b> ·
         Serki (bez przypraw / czarnuszka / pomidory-bazylia / czosnek / curry / chilli) <b>10 zł/szt</b> ·
-        Makrela <b>22 zł/szt</b> · Śledź <b>20 zł/szt</b> · Łosoś <b>55 zł/kg</b> · Krupniok <b>18 zł/kg</b>.
+        Makrela <b>22 zł/szt</b> · Śledź <b>20 zł/szt</b> · Łosoś <b>55 zł/kg</b> · Krupniok <b>18 zł/kg</b> ·
+        <b>Indyk</b> <b>55 zł/kg</b>.
       </div>
       <div id="product-list" style="display:grid; gap:10px; margin-top:10px;"></div>
 
@@ -169,7 +180,7 @@
       </div>
 
       <div style="margin-top:12px; text-align:center;">
-        <button id="btn-add-custom-bottom" class="btn primary">➕ Dodaj własną pozycję (do wyceny)</button>
+        <button id="btn-add-custom-bottom" class="btn primary" type="button">➕ Dodaj własną pozycję (do wyceny)</button>
       </div>
     </div>
 
@@ -187,20 +198,20 @@
       <h3>Podsumowanie</h3>
       <div class="summary" id="summary"></div>
       <div class="actions">
-        <button class="btn" id="btn-copy">Kopiuj</button>
-        <button class="btn" id="btn-csv">CSV</button>
+        <button class="btn" id="btn-copy" type="button">Kopiuj</button>
+        <button class="btn" id="btn-csv" type="button">CSV</button>
         <a class="btn" id="btn-email" href="#">E-mail</a>
         <a class="btn primary" id="btn-wa" href="#" target="_blank">WhatsApp</a>
         <a class="btn" id="btn-sms" href="#">SMS</a>
-        <button class="btn ghost" id="btn-clear">Wyczyść</button>
+        <button class="btn ghost" id="btn-clear" type="button">Wyczyść</button>
       </div>
     </div>
   </div>
 
-  <!-- Modal: własna pozycja -->
-  <div class="modal-backdrop" id="modal-custom">
-    <div class="modal">
-      <h4>Dodaj własną pozycję (do wyceny)</h4>
+  <!-- Modal: własna pozycja (HIDDEN UNTIL OPENED) -->
+  <div class="modal-backdrop" id="modal-custom" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <h4 id="modal-title">Dodaj własną pozycję (do wyceny)</h4>
       <div class="grid">
         <div style="grid-column:1/-1">
           <label for="custom-name" class="field-note">Nazwa (wymagane, 3–60 znaków)</label>
@@ -223,8 +234,8 @@
         </div>
       </div>
       <div class="actions" style="margin-top:10px; justify-content:flex-end; display:flex;">
-        <button class="btn ghost" id="custom-cancel">Anuluj</button>
-        <button class="btn primary" id="custom-save">Dodaj pozycję</button>
+        <button class="btn ghost" id="custom-cancel" type="button">Anuluj</button>
+        <button class="btn primary" id="custom-save" type="button">Dodaj pozycję</button>
       </div>
     </div>
   </div>
@@ -232,7 +243,7 @@
 <script>
 // === KONFIG ===
 const VAC_PRICE = 1.5;
-const KG_STEP = 0.5; // <== żądany skok dla kg
+const KG_STEP = 0.5; // skok dla kg
 const PRICES = {
   'Szynka wędzona': { value: 47, unit: 'kg' },
   'Schab wędzony': { value: 47, unit: 'kg' },
@@ -252,7 +263,8 @@ const PRICES = {
   'Makrela wędzona': { value: 22, unit: 'szt' },
   'Śledź wędzony': { value: 20, unit: 'szt' },
   'Łosoś wędzony': { value: 55, unit: 'kg' },
-  'Krupniok (kaszanka)': { value: 18, unit: 'kg' }
+  'Krupniok (kaszanka)': { value: 18, unit: 'kg' },
+  'Indyk': { value: 55, unit: 'kg' }
 };
 const BASE_PRODUCTS = Object.keys(PRICES).map((name) => {
   const p = PRICES[name];
@@ -265,7 +277,14 @@ let state = { rows: [], filter: '' };
 function loadState(){
   try{
     const s = JSON.parse(localStorage.getItem('wd-state-v3')||'null');
-    if(s && Array.isArray(s.rows)){ state.rows = s.rows; } else { state.rows = [...BASE_PRODUCTS]; }
+    if(s && Array.isArray(s.rows)){
+      // migruj dopełnienie o Indyk jeśli brak
+      const names = new Set(s.rows.map(r => r.name));
+      state.rows = s.rows;
+      if(!names.has('Indyk')) state.rows.push({ id: 'p-indyk', name: 'Indyk', unit: 'kg', price: 55, pack:false, qty: 0, notes:'' });
+    } else {
+      state.rows = [...BASE_PRODUCTS];
+    }
     state.filter = s?.filter || '';
   }catch(e){ state.rows = [...BASE_PRODUCTS]; }
 }
@@ -315,27 +334,21 @@ function makeTile(row){
   const minus = document.createElement('button');
   minus.type = 'button'; minus.textContent = '–';
   const qty = document.createElement('input');
-  qty.type = 'number'; qty.step = '0.01'; // ręczny wpis z dokładnością
+  qty.type = 'number'; qty.step = '0.01';
   qty.placeholder = row.unit==='kg'?'kg':'szt'; qty.value = row.qty>0?row.qty:'';
   const plus = document.createElement('button');
   plus.type = 'button'; plus.textContent = '+';
 
   function updateQty(v){
-    // zaokrąglenie do 0.5 dla kg, do 1 dla sztuk
     const step = row.unit==='kg' ? KG_STEP : 1;
-    const rounded = row.unit==='kg' ? Math.round(v/step)*step : Math.round(v/step)*step;
-    row.qty = Math.max(0, +(rounded.toFixed(2)));
+    // snap do wielokrotności kroku
+    const snapped = Math.round(v/step)*step;
+    row.qty = Math.max(0, +(snapped.toFixed(2)));
     qty.value = row.qty || '';
     saveAndRender();
   }
-  minus.addEventListener('click', ()=> {
-    const step = row.unit==='kg' ? KG_STEP : 1;
-    updateQty(parseQty(qty.value||0) - step);
-  });
-  plus.addEventListener('click', ()=> {
-    const step = row.unit==='kg' ? KG_STEP : 1;
-    updateQty(parseQty(qty.value||0) + step);
-  });
+  minus.addEventListener('click', ()=> updateQty(parseQty(qty.value||0) - (row.unit==='kg'?KG_STEP:1)));
+  plus.addEventListener('click', ()=> updateQty(parseQty(qty.value||0) + (row.unit==='kg'?KG_STEP:1)));
   qty.addEventListener('input', ()=>{ row.qty = parseQty(qty.value); saveAndRender(); });
 
   stepper.appendChild(minus); stepper.appendChild(qty); stepper.appendChild(plus);
@@ -518,9 +531,13 @@ const modal = {
     this.notes.value = '';
     this.clearErrors();
     this.el.style.display = 'flex';
+    this.el.setAttribute('aria-hidden','false');
     setTimeout(()=> this.name.focus(), 0);
   },
-  close(){ this.el.style.display = 'none'; },
+  close(){
+    this.el.style.display = 'none';
+    this.el.setAttribute('aria-hidden','true');
+  },
   clearErrors(){ [this.name,this.qty].forEach(i=> i && i.classList.remove('error')); },
   validate(){
     this.clearErrors();
