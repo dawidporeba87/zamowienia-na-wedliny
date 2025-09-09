@@ -164,7 +164,7 @@ const PLN = new Intl.NumberFormat('pl-PL', { style:'currency', currency:'PLN' })
 const PRICE_MAP = Object.fromEntries(PRICE_LIST.map(p => [p.name, {unit:p.unit, price:p.price}]));
 const DEFAULT_ROWS = PRICE_LIST.map(p => ({ id: slug(p.name), name: p.name, qty: 0, unit: p.unit, pack: false }));
 
-const state = { rows: [], customer: { name:'', phone:'', email:'', pickupDate:'', notes:'' } };
+const state = { rows: [], customer: { name:'', phone:'', email:'', pickupDate:'', notes:'' }, lastAddedId: null };
 
 const els = {
   list: document.getElementById('product-list'),
@@ -175,6 +175,8 @@ const els = {
   destPhone: document.getElementById('dest-phone'),
 };
 
+function slug(s) { return s.toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]+/g,'-').replace(/(^-|-$)/g,''); }
+
 function loadDraft() { try {
   const raw = localStorage.getItem('zamowienia-wedliny-app-draft');
   if (!raw) return;
@@ -183,10 +185,9 @@ function loadDraft() { try {
   if (data.customer) state.customer = data.customer;
 } catch(e){} }
 
-function saveDraft() { localStorage.setItem('zamowienia-wedliny-app-draft', JSON.stringify(state)); }
+function saveDraft() { localStorage.setItem('zamowienia-wedliny-app-draft', JSON.stringify({ ...state, lastAddedId: null })); }
 
 function initRows() { if (!state.rows.length) { state.rows = DEFAULT_ROWS.slice(); } }
-function slug(s) { return s.toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]+/g,'-').replace(/(^-|-$)/g,''); }
 
 function rowPrice(r){ const meta = PRICE_MAP[r.name]; return meta ? meta.price : 0; }
 function rowUnit(r){ const meta = PRICE_MAP[r.name]; return meta ? meta.unit : r.unit; }
@@ -301,14 +302,27 @@ function render() {
     const actions = document.createElement('div');
     const del = document.createElement('button'); del.className='btn ghost'; del.textContent='Usuń';
     del.onclick = () => { state.rows = state.rows.filter(x => x !== r); saveAndRender(); };
-    if (r.id.startsWith('custom-')) actions.appendChild(del);
+    if (r.id && r.id.startsWith('custom-')) actions.appendChild(del);
 
     card.appendChild(nameWrap);
     card.appendChild(qty);
     card.appendChild(packWrap);
-    if (r.id.startsWith('custom-')) card.appendChild(actions);
+    if (r.id && r.id.startsWith('custom-')) card.appendChild(actions);
 
     els.list.appendChild(card);
+
+    // Jeżeli to ostatnio dodana pozycja — ustaw fokus i zaznacz nazwę
+    if (state.lastAddedId && r.id === state.lastAddedId) {
+      setTimeout(() => {
+        try {
+          name.focus();
+          name.select();
+          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } catch(e){}
+        // zresetuj, aby nie fokusować ponownie przy kolejnych renderach
+        state.lastAddedId = null;
+      }, 0);
+    }
   });
 
   // Totals & summary
@@ -386,13 +400,23 @@ function exportCSV() {
       (state.customer.notes||'').replaceAll(',', ';')
     ].join(','));
   });
-  const blob = new Blob([lines.join('\n')], {type:'text/csv;charset=utf-8;'});
+  const blob = new Blob([lines.join('\\n')], {type:'text/csv;charset=utf-8;'});
   const url = URL.createObjectURL(blob); const a = document.createElement('a');
   a.href = url; a.download = `zamowienie_${new Date().toISOString().slice(0,10)}.csv`; a.click(); URL.revokeObjectURL(url);
 }
 
 // Actions
-document.getElementById('btn-add').onclick = () => { state.rows.push({ id:'custom-'+Date.now(), name:'Pozycja własna', qty:0, unit:'kg', pack:false }); saveAndRender(); };
+document.getElementById('btn-add').onclick = () => {
+  // 1) Wyczyść filtr, aby pozycja była widoczna
+  els.search.value = '';
+  // 2) Dodaj nową pozycję na górze listy i zapamiętaj jej ID do fokusu
+  const id = 'custom-' + Date.now();
+  state.rows.unshift({ id, name:'Pozycja własna', qty:0, unit:'kg', pack:false });
+  state.lastAddedId = id;
+  saveAndRender();
+  // 3) Przewiń do początku listy produktów
+  try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch(e){}
+};
 
 document.getElementById('btn-clear').onclick = () => {
   if(!confirm('Wyczyścić wszystkie ilości i dane klienta?')) return;
