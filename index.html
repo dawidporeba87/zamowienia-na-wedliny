@@ -117,12 +117,35 @@
 
   /* Helpers */
   .mini{font-size:12px; color:var(--muted)}
+
+/* --- Hero (short banner) --- */
+.hero{display:flex;justify-content:center;align-items:center;
+  height:clamp(160px,24vh,260px);
+  padding:12px 0;
+  background:radial-gradient(120% 120% at 50% 0%, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0) 60%),
+             linear-gradient(180deg, rgba(17,26,38,0.85) 0%, rgba(17,26,38,0.65) 100%);
+  border-bottom:1px solid var(--border);
+}
+.hero .hero-logo{display:block;margin:0 auto;
+  max-width:clamp(360px,60vw,1000px);
+  max-height:clamp(100px,18vh,220px);
+  width:auto;height:auto;object-fit:contain;
+  filter:drop-shadow(0 6px 10px rgba(0,0,0,.35));
+}
+@media (max-width:640px){
+  .hero{height:clamp(140px,28vh,200px); padding:8px 0;}
+}
+
 </style>
 </head>
 <body>
   <div class="topbar">
     <img src="logo.png" class="logo" alt="Logo" />
     </div>
+<section class="hero">
+  <img class="hero-logo" src="A_digital_graphic_design_features_bold_text_readin.png" alt="Wędliny z druciarni">
+</section>
+
   </div>
 
   <div class="content">
