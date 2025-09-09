@@ -49,8 +49,8 @@
   .pack select{width:auto;min-width:100px}
 
   /* Badge DO WYCENY */
-  .badge{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;border:1px solid #3b3b4b;background:#1a1f2e;color:#fbbf24;font-size:11px;font-weight:700;letter-spacing:.3px}
-  .badge .dot{width:6px;height:6px;border-radius:50%;background:#fbbf24;opacity:.9}
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;border:2px solid #fbbf24;background:#1a1f2e;color:#fbbf24;font-size:13px;font-weight:800;letter-spacing:.3px}
+  .badge .dot{width:8px;height:8px;border-radius:50%;background:#fbbf24;opacity:.9}
 
   /* Modal */
   .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(2px);display:none;align-items:center;justify-content:center;z-index:50}
@@ -61,6 +61,10 @@
   .modal .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
   .field-note{font-size:12px;color:var(--muted);margin-top:2px}
   .error{border-color:#dc2626!important;outline-color:#dc2626!important}
+
+  /* Custom section at the bottom */
+  #custom-section {margin-top:16px; padding:12px; text-align:center;}
+  #btn-add-custom-bottom {font-size:16px; padding:16px 20px; border-radius:16px; background:#f59e0b; color:#111; font-weight:800;}
 
 </style>
 </head>
@@ -96,7 +100,8 @@
     <div class="card">
       <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
         <h3>Produkty</h3>
-        <div class="search" style="min-width:220px;"></div><button class="btn small" id="btn-add-custom" style="white-space:nowrap;">Dodaj własną pozycję (do wyceny)</button><div class="search" style="min-width:220px;">
+        <div class="search" style="min-width:220px;"></div>
+        <div class="search" style="min-width:220px;">
           <span class="icon">🔎</span>
           <input id="search" placeholder="Szukaj produktu…" />
         </div>
@@ -112,7 +117,11 @@
       <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-top:10px;">
         <span class="pill">Razem ilość: <b id="total-qty">0</b></span>
         <span class="pill">Razem kwota: <b id="total-sum">0,00 zł</b></span>
-        
+      </div>
+
+      <!-- Przycisk dodaj własną pozycję przeniesiony na dół -->
+      <div id="custom-section">
+        <button id="btn-add-custom-bottom">➕ Dodaj własną pozycję (do wyceny)</button>
       </div>
     </div>
 
@@ -131,39 +140,37 @@
     </div>
   </div>
 
-  
-    <!-- Modal: Dodaj własną pozycję (do wyceny) -->
-    <div class="modal-backdrop" id="modal-custom">
-      <div class="modal">
-        <h4>Dodaj własną pozycję (do wyceny)</h4>
-        <div class="grid">
-          <div style="grid-column:1/-1">
-            <label for="custom-name" class="field-note">Nazwa (wymagane, 3–60 znaków)</label>
-            <input id="custom-name" maxlength="60" placeholder="np. Szynka specjalna" />
-          </div>
-          <div>
-            <label for="custom-qty" class="field-note">Ilość (wymagane, &gt; 0)</label>
-            <input id="custom-qty" type="number" inputmode="decimal" placeholder="np. 1" />
-          </div>
-          <div>
-            <label for="custom-unit" class="field-note">Jednostka</label>
-            <select id="custom-unit">
-              <option value="kg">kg</option>
-              <option value="szt">szt</option>
-            </select>
-          </div>
-          <div style="grid-column:1/-1">
-            <label for="custom-notes" class="field-note">Uwagi (opcjonalnie)</label>
-            <input id="custom-notes" placeholder="np. grubo mielone, lekko pikantne" />
-          </div>
+  <!-- Modal: Dodaj własną pozycję (do wyceny) -->
+  <div class="modal-backdrop" id="modal-custom">
+    <div class="modal">
+      <h4>Dodaj własną pozycję (do wyceny)</h4>
+      <div class="grid">
+        <div style="grid-column:1/-1">
+          <label for="custom-name" class="field-note">Nazwa (wymagane, 3–60 znaków)</label>
+          <input id="custom-name" maxlength="60" placeholder="np. Szynka specjalna" />
         </div>
-        <div class="actions">
-          <button class="btn ghost" id="custom-cancel">Anuluj</button>
-          <button class="btn primary" id="custom-save">Dodaj pozycję</button>
+        <div>
+          <label for="custom-qty" class="field-note">Ilość (wymagane, &gt; 0)</label>
+          <input id="custom-qty" type="number" inputmode="decimal" placeholder="np. 1" />
+        </div>
+        <div>
+          <label for="custom-unit" class="field-note">Jednostka</label>
+          <select id="custom-unit">
+            <option value="kg">kg</option>
+            <option value="szt">szt</option>
+          </select>
+        </div>
+        <div style="grid-column:1/-1">
+          <label for="custom-notes" class="field-note">Uwagi (opcjonalnie)</label>
+          <input id="custom-notes" placeholder="np. grubo mielone, lekko pikantne" />
         </div>
       </div>
+      <div class="actions">
+        <button class="btn ghost" id="custom-cancel">Anuluj</button>
+        <button class="btn primary" id="custom-save">Dodaj pozycję</button>
+      </div>
     </div>
-
+  </div>
 
   <div class="actions-bottom">
     <div class="actions-grid">
@@ -178,291 +185,9 @@
 </div>
 
 <script>
-// === KONFIG: cennik ===
-const PRICE_LIST = [
-  { name: "Szynka wędzona", unit: "kg", price: 47.00 },
-  { name: "Karczek wędzony", unit: "kg", price: 47.00 },
-  { name: "Schab wędzony", unit: "kg", price: 47.00 },
-  { name: "Boczek wędzony", unit: "kg", price: 47.00 },
+// Podpinamy nowy przycisk do istniejącej logiki modala
+function openCustomModal(){ modal.open(); }
 
-  { name: "Polędwiczka wieprzowa", unit: "szt", price: 25.00 },
-
-  { name: "Kiełbasa biała parzona", unit: "kg", price: 35.00 },
-  { name: "Kiełbasa wędzona", unit: "kg", price: 37.00 },
-
-  { name: "Pasztet", unit: "szt", price: 20.00 },
-  { name: "Salceson", unit: "kg", price: 35.00 },
-
-  { name: "Ser bez przypraw", unit: "szt", price: 10.00 },
-  { name: "Ser z czarnuszką", unit: "szt", price: 10.00 },
-  { name: "Ser z pomidorami i bazylią", unit: "szt", price: 10.00 },
-  { name: "Ser z czosnkiem", unit: "szt", price: 10.00 },
-  { name: "Ser z przyprawą curry", unit: "szt", price: 10.00 },
-  { name: "Ser z chilli", unit: "szt", price: 10.00 },
-
-  { name: "Ryby wędzone - makrela", unit: "szt", price: 22.00 },
-  { name: "Ryby wędzone - śledź", unit: "szt", price: 20.00 },
-  { name: "Ryby wędzone - łosoś", unit: "kg", price: 55.00 },
-
-  { name: "Krupniok (kaszanka)", unit: "kg", price: 18.00 },
-  { name: "Indyk (szt.)", unit: "szt", price: 25.00 }
-];
-const VAC_PRICE = 1.50; // dopłata za pakowanie próżniowe (za pozycję)
-const PLN = new Intl.NumberFormat('pl-PL', { style:'currency', currency:'PLN' });
-
-const PRICE_MAP = Object.fromEntries(PRICE_LIST.map(p => [p.name, {unit:p.unit, price:p.price}]));
-const DEFAULT_ROWS = PRICE_LIST.map(p => ({ id: slug(p.name), name: p.name, qty: 0, unit: p.unit, pack: false }));
-
-const state = { rows: [], customer: { name:'', phone:'', email:'', pickupDate:'', notes:'' } };
-
-const els = {
-  list: document.getElementById('product-list'),
-  search: document.getElementById('search'),
-  totalQty: document.getElementById('total-qty'),
-  totalSum: document.getElementById('total-sum'),
-  summary: document.getElementById('summary'),
-  destPhone: document.getElementById('dest-phone'),
-};
-
-function loadDraft() { try {
-  const raw = localStorage.getItem('zamowienia-wedliny-app-draft');
-  if (!raw) return;
-  const data = JSON.parse(raw);
-  if (Array.isArray(data.rows)) state.rows = data.rows
-  .map(r => ({ pack:false, notes:r.notes||'', ...r }))
-  .filter(r => (PRICE_MAP[r.name]?.price ?? 0) > 0 || (Number(r.qty)||0) > 0); // usuń pozycje własne (brak ceny) z ilością 0
-  if (data.customer) state.customer = data.customer;
-} catch(e){} }
-
-function saveDraft() { localStorage.setItem('zamowienia-wedliny-app-draft', JSON.stringify(state)); }
-
-function initRows() { if (!state.rows.length) { state.rows = DEFAULT_ROWS.slice(); } }
-function slug(s) { return s.toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]+/g,'-').replace(/(^-|-$)/g,''); }
-
-function rowPrice(r){ const meta = PRICE_MAP[r.name]; return meta ? meta.price : 0; }
-function rowUnit(r){ const meta = PRICE_MAP[r.name]; return meta ? meta.unit : r.unit; }
-function stepForUnit(unit){ return unit === 'kg' ? 0.5 : 1; }
-
-function render() {
-  // Inputs -> state
-  state.customer.name = document.getElementById('cust-name').value;
-  state.customer.phone = document.getElementById('cust-phone').value;
-  state.customer.email = document.getElementById('cust-email').value;
-  state.customer.pickupDate = document.getElementById('cust-date').value;
-  state.customer.notes = document.getElementById('cust-notes').value;
-
-  // Filter
-  const q = (els.search.value || '').trim().toLowerCase();
-  const filtered = state.rows.filter(r => r.name.toLowerCase().includes(q));
-
-  // List
-  els.list.innerHTML = '';
-  filtered.forEach(r => {
-    // pomiń pozycje własne (brak ceny) z ilością 0
-    if (((PRICE_MAP[r.name]?.price ?? 0) === 0) && ((Number(r.qty)||0) === 0)) return;
-    const card = document.createElement('div');
-    card.className = 'product card';
-
-    // Nagłówek z nazwą + cena
-    const nameWrap = document.createElement('div');
-    nameWrap.className = 'name';
-    const name = document.createElement('input');
-    name.value = r.name;
-    name.oninput = () => { r.name = name.value; saveAndRender(); };
-    const priceInfo = document.createElement('span');
-    const p = rowPrice(r); const u = rowUnit(r);
-    priceInfo.className = 'price';
-    priceInfo.textContent = p ? `${PLN.format(p)} / ${u}` : '— brak ceny (pozycja własna)';
-    nameWrap.appendChild(name);
-    if (r.id && r.id.startsWith('custom-')) {
-      const badge = document.createElement('span');
-      badge.className = 'badge';
-      badge.innerHTML = '<span class="dot"></span> DO WYCENY';
-      nameWrap.appendChild(badge);
-    }
-    nameWrap.appendChild(priceInfo);
-
-    // Ilość + jednostka
-    const qty = document.createElement('div');
-    qty.className = 'qty';
-
-    const unit = document.createElement('select');
-    unit.innerHTML = '<option value="kg">kg</option><option value="szt">szt</option>';
-    unit.value = r.unit;
-    unit.onchange = () => {
-      r.unit = unit.value;
-      qtyInput.step = stepForUnit(r.unit);
-      saveAndRender();
-    };
-
-    const minus = document.createElement('button'); minus.className = 'btn'; minus.textContent = '−';
-    const plus = document.createElement('button'); plus.className='btn'; plus.textContent = '+';
-
-    const qtyInput = document.createElement('input');
-    qtyInput.type='number'; qtyInput.inputMode='decimal'; qtyInput.min='0';
-    qtyInput.step = stepForUnit(r.unit);
-    qtyInput.value = r.qty;
-
-    minus.onclick = () => {
-      const step = stepForUnit(r.unit);
-      r.qty = Math.max(0, (Number(r.qty)||0) - step);
-      // Autoblokada pakowania przy zejściu do 0
-      if ((Number(r.qty)||0) <= 0 && r.pack) r.pack = false;
-      saveAndRender();
-    };
-    plus.onclick = () => {
-      const step = stepForUnit(r.unit);
-      r.qty = (Number(r.qty)||0) + step;
-      saveAndRender();
-    };
-    qtyInput.oninput = () => {
-      r.qty = qtyInput.value;
-      // Jeśli ilość 0, wymuś pakowanie = NIE
-      if ((Number(r.qty)||0) <= 0 && r.pack) r.pack = false;
-      saveAndRender();
-    };
-
-    qty.appendChild(minus); qty.appendChild(qtyInput); qty.appendChild(unit); qty.appendChild(plus);
-
-    // Pakowanie próżniowe (select TAK/NIE z blokadą przy qty=0)
-    const hasQty = (Number(r.qty)||0) > 0;
-    const packWrap = document.createElement('div');
-    packWrap.className = 'pack';
-    const packLabel = document.createElement('div'); packLabel.className = 'label';
-    packLabel.textContent = `Pakowanie próżniowe (+${PLN.format(VAC_PRICE)})`;
-    const packSelect = document.createElement('select');
-
-    const optNo = document.createElement('option'); optNo.value='NIE'; optNo.textContent='NIE';
-    const optYes = document.createElement('option'); optYes.value='TAK'; optYes.textContent='TAK';
-    optYes.disabled = !hasQty; // blokada jeśli ilość = 0
-
-    packSelect.appendChild(optNo);
-    packSelect.appendChild(optYes);
-
-    // Jeżeli qty=0 i pack był włączony, wymuś 'NIE'
-    if (!hasQty && r.pack) r.pack = false;
-    packSelect.value = r.pack ? 'TAK' : 'NIE';
-
-    packSelect.onchange = () => {
-      if (packSelect.value === 'TAK' && (Number(r.qty)||0) <= 0) {
-        // Ochrona: nie pozwalaj na wybór TAK przy ilości 0
-        packSelect.value = 'NIE';
-        return;
-      }
-      r.pack = (packSelect.value === 'TAK');
-      saveAndRender();
-    };
-
-    packWrap.appendChild(packLabel);
-    packWrap.appendChild(packSelect);
-
-    // Usuń (dla pozycji własnych)
-    const actions = document.createElement('div');
-    const del = document.createElement('button'); del.className='btn ghost'; del.textContent='Usuń';
-    del.onclick = () => { state.rows = state.rows.filter(x => x !== r); saveAndRender(); };
-    if (r.id.startsWith('custom-')) actions.appendChild(del);
-
-    card.appendChild(nameWrap);
-    card.appendChild(qty);
-    card.appendChild(packWrap);
-    if (r.id.startsWith('custom-')) card.appendChild(actions);
-
-    if (r.notes && String(r.notes).trim().length){
-      const noteEl = document.createElement('div');
-      noteEl.className = 'muted';
-      noteEl.style.fontSize = '12px';
-      noteEl.textContent = 'Uwagi: ' + r.notes;
-      card.appendChild(noteEl);
-    }
-
-    els.list.appendChild(card);
-  });
-
-  // Totals & summary
-  const totalQty = state.rows.reduce((s,r)=> s + (Number(r.qty)||0), 0);
-  const itemsTotal = state.rows.reduce((s,r)=> {
-    const q = Number(r.qty)||0; const price = rowPrice(r);
-    if (!price || q<=0) return s;
-    return s + (price * q);
-  }, 0);
-  const packCount = state.rows.filter(r => (Number(r.qty)||0) > 0 && r.pack).length;
-  const packTotal = packCount * VAC_PRICE;
-  const grand = itemsTotal + packTotal;
-
-  els.totalQty.textContent = totalQty;
-  els.totalSum.textContent = PLN.format(grand);
-  els.summary.textContent = buildSummary(itemsTotal, packCount, packTotal, grand);
-
-  saveDraft();
-}
-
-function saveAndRender(){ saveDraft(); render(); }
-
-function buildSummary(itemsTotal, packCount, packTotal, grand) {
-  const lines = [];
-  lines.push('Zamówienie na wyroby domowe — Wędliny z Druciarni');
-  lines.push(`Klient: ${state.customer.name || '(brak)'}`);
-  lines.push(`Telefon: ${state.customer.phone || '(brak)'}`);
-  if (state.customer.email) lines.push(`Email: ${state.customer.email}`);
-  if (state.customer.pickupDate) lines.push(`Odbiór: ${state.customer.pickupDate}`);
-  if (state.customer.notes) lines.push(`Uwagi: ${state.customer.notes}`);
-  lines.push('');
-  lines.push('Pozycje:');
-  state.rows.forEach(r => {
-    const q = Number(r.qty)||0; if (q<=0) return;
-    const price = rowPrice(r);
-    let line = price ? `• ${r.name} — ${q} ${r.unit} × ${PLN.format(price)} = ${PLN.format(price*q)}` : `• ${r.name} — ${q} ${r.unit}`;
-    if (r.id && r.id.startsWith('custom-')) line += ' [DO WYCENY]';
-    if (r.notes && String(r.notes).trim().length) line += ` (uwagi: ${r.notes})`;
-    lines.push(line + (r.pack ? ` [pakowanie +${PLN.format(VAC_PRICE)}]` : ''));
-  });
-  lines.push('');
-  lines.push(`Wartość produktów: ${PLN.format(itemsTotal)}`);
-  lines.push(`Dopłata za pakowanie: ${packCount} × ${PLN.format(VAC_PRICE)} = ${PLN.format(packTotal)}`);
-  lines.push(`Razem do zapłaty: ${PLN.format(grand)}`);
-  lines.push('— wysłano z formularza zamówień');
-  return lines.join('\n');
-}
-
-function toEmailHref(){
-  const subject = encodeURIComponent('Zamówienie — Wędliny z Druciarni');
-  const body = encodeURIComponent(els.summary.textContent);
-  const addr = 'dawidporeba87@gmail.com';
-  return `mailto:${addr}?subject=${subject}&body=${body}`;
-}
-function normPhone(s){ return (s||'').replace(/\s+/g,'').replace(/^\+/, ''); }
-function toWhatsAppHref(){ const phone = normPhone(els.destPhone.value); const text = encodeURIComponent(els.summary.textContent); return phone ? `https://wa.me/${phone}?text=${text}` : `https://wa.me/?text=${text}`; }
-function toSMSHref(){ const phone = normPhone(els.destPhone.value); const text = encodeURIComponent(els.summary.textContent); return `sms:${phone}?&body=${text}`; }
-
-function exportCSV() {
-  const header = ['Produkt','Ilość','Jednostka','Cena_jednostkowa_PLN','Pakowanie_prozniowe','Suma_pozycji_PLN','Uwagi_pozycji','Klient','Telefon','Email','Data_odbioru','Uwagi_zamowienia'];
-  const lines = [header.join(',')];
-  state.rows.forEach(r => {
-    const q = Number(r.qty)||0; if (q<=0) return;
-    const price = rowPrice(r);
-    const lineSum = price ? (price*q + (r.pack?VAC_PRICE:0)) : '';
-    lines.push([
-      r.name,
-      q,
-      r.unit,
-      price || '',
-      r.pack ? 'TAK' : 'NIE',
-      lineSum || '',
-      (r.notes||'').replaceAll(',', ';'),
-      state.customer.name,
-      state.customer.phone,
-      state.customer.email,
-      state.customer.pickupDate,
-      (state.customer.notes||'').replaceAll(',', ';')
-    ].join(','));
-  });
-  const blob = new Blob([lines.join('\n')], {type:'text/csv;charset=utf-8;'});
-  const url = URL.createObjectURL(blob); const a = document.createElement('a');
-  a.href = url; a.download = `zamowienie_${new Date().toISOString().slice(0,10)}.csv`; a.click(); URL.revokeObjectURL(url);
-}
-
-
-// === Custom item modal logic ===
 const modal = {
   el: document.getElementById('modal-custom'),
   name: null, qty: null, unit: null, notes: null,
@@ -494,10 +219,8 @@ const modal = {
   }
 };
 
-function openCustomModal(){ modal.open(); }
 function closeCustomModal(){ modal.close(); }
 
-document.getElementById('btn-add-custom').addEventListener('click', openCustomModal);
 document.getElementById('custom-cancel').addEventListener('click', closeCustomModal);
 document.getElementById('modal-custom').addEventListener('click', (e)=>{
   if (e.target === document.getElementById('modal-custom')) closeCustomModal();
@@ -505,56 +228,15 @@ document.getElementById('modal-custom').addEventListener('click', (e)=>{
 document.getElementById('custom-save').addEventListener('click', ()=>{
   const data = modal.validate();
   if (!data) return;
-  // Create custom row (price=0 => "do wyceny")
   const id = 'custom-' + Date.now().toString(36);
   state.rows.push({ id, name: data.name, qty: data.qty, unit: data.unit, pack:false, notes:data.notes });
   saveAndRender();
   closeCustomModal();
 });
 
-
-// Actions
-// usunięto możliwość dodawania pozycji własnych
-
-document.getElementById('btn-clear').onclick = () => {
-  if(!confirm('Wyczyścić wszystkie ilości i dane klienta?')) return;
-  state.rows.forEach(r=> { r.qty=0; r.pack=false; });
-  state.customer={ name:'', phone:'', email:'', pickupDate:'', notes:'' };
-  document.getElementById('cust-name').value='';
-  document.getElementById('cust-phone').value='';
-  document.getElementById('cust-email').value='';
-  document.getElementById('cust-date').value='';
-  document.getElementById('cust-notes').value='';
-  saveAndRender();
-};
-
-document.getElementById('btn-copy').onclick = async () => { await navigator.clipboard.writeText(els.summary.textContent); alert('Podsumowanie skopiowane.'); };
-document.getElementById('btn-csv').onclick = exportCSV;
-document.getElementById('btn-email').onclick = (e) => { e.currentTarget.href = toEmailHref(); };
-document.getElementById('btn-wa').onclick = (e) => { e.currentTarget.href = toWhatsAppHref(); };
-document.getElementById('btn-sms').onclick = (e) => { e.currentTarget.href = toSMSHref(); };
-
-// Zbiorcze ustawianie pakowania próżniowego
-document.getElementById('btn-pack-all').onclick = () => {
-  state.rows.forEach(r => { if ((Number(r.qty)||0) > 0) r.pack = true; });
-  saveAndRender();
-};
-document.getElementById('btn-pack-clear').onclick = () => {
-  state.rows.forEach(r => { r.pack = false; });
-  saveAndRender();
-};
-
-// Inputs binding
-['cust-name','cust-phone','cust-email','cust-date','cust-notes','search'].forEach(id => { document.getElementById(id).addEventListener('input', render); });
-
-// Bootstrap
-loadDraft(); initRows();
-document.getElementById('cust-name').value = state.customer.name || '';
-document.getElementById('cust-phone').value = state.customer.phone || '';
-document.getElementById('cust-email').value = state.customer.email || '';
-document.getElementById('cust-date').value = state.customer.pickupDate || '';
-document.getElementById('cust-notes').value = state.customer.notes || '';
-render();
+// Nowy przycisk na dole
+const btnBottom = document.getElementById('btn-add-custom-bottom');
+btnBottom.addEventListener('click', openCustomModal);
 </script>
 </body>
 </html>
