@@ -97,7 +97,7 @@
       <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-top:10px;">
         <span class="pill">Razem ilość: <b id="total-qty">0</b></span>
         <span class="pill">Razem kwota: <b id="total-sum">0,00 zł</b></span>
-        <button class="btn" id="btn-add">+ Dodaj pozycję</button>
+        
       </div>
     </div>
 
@@ -179,7 +179,9 @@ function loadDraft() { try {
   const raw = localStorage.getItem('zamowienia-wedliny-app-draft');
   if (!raw) return;
   const data = JSON.parse(raw);
-  if (Array.isArray(data.rows)) state.rows = data.rows.map(r => ({ pack:false, ...r }));
+  if (Array.isArray(data.rows)) state.rows = data.rows
+  .map(r => ({ pack:false, ...r }))
+  .filter(r => (PRICE_MAP[r.name]?.price ?? 0) > 0 || (Number(r.qty)||0) > 0); // usuń pozycje własne (brak ceny) z ilością 0
   if (data.customer) state.customer = data.customer;
 } catch(e){} }
 
@@ -207,6 +209,8 @@ function render() {
   // List
   els.list.innerHTML = '';
   filtered.forEach(r => {
+    // pomiń pozycje własne (brak ceny) z ilością 0
+    if (((PRICE_MAP[r.name]?.price ?? 0) === 0) && ((Number(r.qty)||0) === 0)) return;
     const card = document.createElement('div');
     card.className = 'product card';
 
@@ -392,7 +396,7 @@ function exportCSV() {
 }
 
 // Actions
-document.getElementById('btn-add').onclick = () => { state.rows.push({ id:'custom-'+Date.now(), name:'Pozycja własna', qty:0, unit:'kg', pack:false }); saveAndRender(); };
+// usunięto możliwość dodawania pozycji własnych
 
 document.getElementById('btn-clear').onclick = () => {
   if(!confirm('Wyczyścić wszystkie ilości i dane klienta?')) return;
