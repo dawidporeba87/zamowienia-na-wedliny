@@ -47,6 +47,21 @@
   .pack{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:10px;font-size:12px;color:#cfe5d9}
   .pack .label{display:inline-block;padding:10px 12px;border-radius:12px;background:#0b1220;border:1px solid #2a3648;font-size:14px;font-weight:800;letter-spacing:.2px;opacity:1}
   .pack select{width:auto;min-width:100px}
+
+  /* Badge DO WYCENY */
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;border:1px solid #3b3b4b;background:#1a1f2e;color:#fbbf24;font-size:11px;font-weight:700;letter-spacing:.3px}
+  .badge .dot{width:6px;height:6px;border-radius:50%;background:#fbbf24;opacity:.9}
+
+  /* Modal */
+  .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(2px);display:none;align-items:center;justify-content:center;z-index:50}
+  .modal{width:min(560px,92vw);background:var(--card);border:1px solid #1f2937;border-radius:16px;box-shadow:0 15px 40px rgba(0,0,0,.45);padding:16px}
+  .modal h4{margin:0 0 10px 0;font-size:16px}
+  .modal .grid{display:grid;gap:10px;grid-template-columns:1fr}
+  @media (min-width:640px){.modal .grid{grid-template-columns:1fr 1fr}}
+  .modal .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
+  .field-note{font-size:12px;color:var(--muted);margin-top:2px}
+  .error{border-color:#dc2626!important;outline-color:#dc2626!important}
+
 </style>
 </head>
 <body>
@@ -81,7 +96,7 @@
     <div class="card">
       <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
         <h3>Produkty</h3>
-        <div class="search" style="min-width:220px;">
+        <div class="search" style="min-width:220px;"></div><button class="btn small" id="btn-add-custom" style="white-space:nowrap;">Dodaj własną pozycję (do wyceny)</button><div class="search" style="min-width:220px;">
           <span class="icon">🔎</span>
           <input id="search" placeholder="Szukaj produktu…" />
         </div>
@@ -115,6 +130,40 @@
       <div class="summary" id="summary"></div>
     </div>
   </div>
+
+  
+    <!-- Modal: Dodaj własną pozycję (do wyceny) -->
+    <div class="modal-backdrop" id="modal-custom">
+      <div class="modal">
+        <h4>Dodaj własną pozycję (do wyceny)</h4>
+        <div class="grid">
+          <div style="grid-column:1/-1">
+            <label for="custom-name" class="field-note">Nazwa (wymagane, 3–60 znaków)</label>
+            <input id="custom-name" maxlength="60" placeholder="np. Szynka specjalna" />
+          </div>
+          <div>
+            <label for="custom-qty" class="field-note">Ilość (wymagane, &gt; 0)</label>
+            <input id="custom-qty" type="number" inputmode="decimal" placeholder="np. 1" />
+          </div>
+          <div>
+            <label for="custom-unit" class="field-note">Jednostka</label>
+            <select id="custom-unit">
+              <option value="kg">kg</option>
+              <option value="szt">szt</option>
+            </select>
+          </div>
+          <div style="grid-column:1/-1">
+            <label for="custom-notes" class="field-note">Uwagi (opcjonalnie)</label>
+            <input id="custom-notes" placeholder="np. grubo mielone, lekko pikantne" />
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn ghost" id="custom-cancel">Anuluj</button>
+          <button class="btn primary" id="custom-save">Dodaj pozycję</button>
+        </div>
+      </div>
+    </div>
+
 
   <div class="actions-bottom">
     <div class="actions-grid">
@@ -180,7 +229,7 @@ function loadDraft() { try {
   if (!raw) return;
   const data = JSON.parse(raw);
   if (Array.isArray(data.rows)) state.rows = data.rows
-  .map(r => ({ pack:false, ...r }))
+  .map(r => ({ pack:false, notes:r.notes||'', ...r }))
   .filter(r => (PRICE_MAP[r.name]?.price ?? 0) > 0 || (Number(r.qty)||0) > 0); // usuń pozycje własne (brak ceny) z ilością 0
   if (data.customer) state.customer = data.customer;
 } catch(e){} }
@@ -225,6 +274,12 @@ function render() {
     priceInfo.className = 'price';
     priceInfo.textContent = p ? `${PLN.format(p)} / ${u}` : '— brak ceny (pozycja własna)';
     nameWrap.appendChild(name);
+    if (r.id && r.id.startsWith('custom-')) {
+      const badge = document.createElement('span');
+      badge.className = 'badge';
+      badge.innerHTML = '<span class="dot"></span> DO WYCENY';
+      nameWrap.appendChild(badge);
+    }
     nameWrap.appendChild(priceInfo);
 
     // Ilość + jednostka
@@ -312,6 +367,14 @@ function render() {
     card.appendChild(packWrap);
     if (r.id.startsWith('custom-')) card.appendChild(actions);
 
+    if (r.notes && String(r.notes).trim().length){
+      const noteEl = document.createElement('div');
+      noteEl.className = 'muted';
+      noteEl.style.fontSize = '12px';
+      noteEl.textContent = 'Uwagi: ' + r.notes;
+      card.appendChild(noteEl);
+    }
+
     els.list.appendChild(card);
   });
 
@@ -348,7 +411,9 @@ function buildSummary(itemsTotal, packCount, packTotal, grand) {
   state.rows.forEach(r => {
     const q = Number(r.qty)||0; if (q<=0) return;
     const price = rowPrice(r);
-    const line = price ? `• ${r.name} — ${q} ${r.unit} × ${PLN.format(price)} = ${PLN.format(price*q)}` : `• ${r.name} — ${q} ${r.unit}`;
+    let line = price ? `• ${r.name} — ${q} ${r.unit} × ${PLN.format(price)} = ${PLN.format(price*q)}` : `• ${r.name} — ${q} ${r.unit}`;
+    if (r.id && r.id.startsWith('custom-')) line += ' [DO WYCENY]';
+    if (r.notes && String(r.notes).trim().length) line += ` (uwagi: ${r.notes})`;
     lines.push(line + (r.pack ? ` [pakowanie +${PLN.format(VAC_PRICE)}]` : ''));
   });
   lines.push('');
@@ -370,7 +435,7 @@ function toWhatsAppHref(){ const phone = normPhone(els.destPhone.value); const t
 function toSMSHref(){ const phone = normPhone(els.destPhone.value); const text = encodeURIComponent(els.summary.textContent); return `sms:${phone}?&body=${text}`; }
 
 function exportCSV() {
-  const header = ['Produkt','Ilość','Jednostka','Cena_jednostkowa_PLN','Pakowanie_prozniowe','Suma_pozycji_PLN','Klient','Telefon','Email','Data_odbioru','Uwagi'];
+  const header = ['Produkt','Ilość','Jednostka','Cena_jednostkowa_PLN','Pakowanie_prozniowe','Suma_pozycji_PLN','Uwagi_pozycji','Klient','Telefon','Email','Data_odbioru','Uwagi_zamowienia'];
   const lines = [header.join(',')];
   state.rows.forEach(r => {
     const q = Number(r.qty)||0; if (q<=0) return;
@@ -383,6 +448,7 @@ function exportCSV() {
       price || '',
       r.pack ? 'TAK' : 'NIE',
       lineSum || '',
+      (r.notes||'').replaceAll(',', ';'),
       state.customer.name,
       state.customer.phone,
       state.customer.email,
@@ -394,6 +460,58 @@ function exportCSV() {
   const url = URL.createObjectURL(blob); const a = document.createElement('a');
   a.href = url; a.download = `zamowienie_${new Date().toISOString().slice(0,10)}.csv`; a.click(); URL.revokeObjectURL(url);
 }
+
+
+// === Custom item modal logic ===
+const modal = {
+  el: document.getElementById('modal-custom'),
+  name: null, qty: null, unit: null, notes: null,
+  open(){
+    this.name = document.getElementById('custom-name');
+    this.qty = document.getElementById('custom-qty');
+    this.unit = document.getElementById('custom-unit');
+    this.notes = document.getElementById('custom-notes');
+    this.name.value = '';
+    this.qty.value = '';
+    this.unit.value = 'kg';
+    this.notes.value = '';
+    this.clearErrors();
+    this.el.style.display = 'flex';
+    setTimeout(()=> this.name.focus(), 0);
+  },
+  close(){ this.el.style.display = 'none'; },
+  clearErrors(){
+    [this.name,this.qty].forEach(i=> i && i.classList.remove('error'));
+  },
+  validate(){
+    this.clearErrors();
+    const n = (this.name.value||'').trim();
+    const q = parseFloat(this.qty.value.replace(',', '.'));
+    let ok = true;
+    if (n.length < 3 || n.length > 60){ this.name.classList.add('error'); ok = false; }
+    if (!(q > 0)){ this.qty.classList.add('error'); ok = false; }
+    return ok ? { name:n, qty:q, unit:this.unit.value, notes:(this.notes.value||'').trim() } : null;
+  }
+};
+
+function openCustomModal(){ modal.open(); }
+function closeCustomModal(){ modal.close(); }
+
+document.getElementById('btn-add-custom').addEventListener('click', openCustomModal);
+document.getElementById('custom-cancel').addEventListener('click', closeCustomModal);
+document.getElementById('modal-custom').addEventListener('click', (e)=>{
+  if (e.target === document.getElementById('modal-custom')) closeCustomModal();
+});
+document.getElementById('custom-save').addEventListener('click', ()=>{
+  const data = modal.validate();
+  if (!data) return;
+  // Create custom row (price=0 => "do wyceny")
+  const id = 'custom-' + Date.now().toString(36);
+  state.rows.push({ id, name: data.name, qty: data.qty, unit: data.unit, pack:false, notes:data.notes });
+  saveAndRender();
+  closeCustomModal();
+});
+
 
 // Actions
 // usunięto możliwość dodawania pozycji własnych
