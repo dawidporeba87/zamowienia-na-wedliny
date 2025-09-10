@@ -17,9 +17,23 @@
     background:var(--bg); color:var(--text);
   }
 
-  /* Topbar */
-  .topbar{position:sticky;top:0;z-index:20;display:flex;justify-content:center;align-items:center;padding:6px 0;background:linear-gradient(180deg,rgba(11,15,26,.97),rgba(11,15,26,.88));backdrop-filter:saturate(180%) blur(8px);border-bottom:1px solid var(--border);}
-  .logo{width:auto;height:auto;display:block;margin:0 auto;background:transparent;max-width:clamp(260px,40vw,780px);max-height:clamp(64px,12vw,180px);object-fit:contain;filter:drop-shadow(0 2px 4px rgba(0,0,0,.35))}
+  /* Topbar (HEADER) */
+  .topbar{
+    position:sticky; top:0; z-index:20;
+    display:flex; justify-content:center; align-items:center;
+    padding:calc(6px + env(safe-area-inset-top)) 0 6px;
+    background:linear-gradient(180deg,rgba(11,15,26,.97),rgba(11,15,26,.88));
+    backdrop-filter:saturate(180%) blur(8px);
+    border-bottom:1px solid var(--border);
+  }
+  .logo{
+    width:auto; height:auto; display:block; margin:0 auto; background:transparent;
+    max-width:clamp(260px,40vw,780px);
+    max-height:clamp(64px,12vw,180px);
+    object-fit:contain;
+    filter:drop-shadow(0 2px 4px rgba(0,0,0,.35))
+  }
+
   .title h1{margin:0; font-size:18px; letter-spacing:.2px}
   .title .tag{font-size:12px; color:var(--muted)}
 
@@ -120,9 +134,9 @@
 </style>
 </head>
 <body>
-  <div class="topbar">
-    <img src="logo.png" class="logo" alt="Logo" />
-    </div>
+  <!-- FIXED: header has correct closing tag -->
+  <div class="topbar" role="banner" aria-label="Wędliny z Druciarni">
+    <img src="logo.png" class="logo" alt="Wędliny z Druciarni" />
   </div>
 
   <div class="content">
@@ -231,7 +245,7 @@
   </div>
 
 <script>
-// === KONFIG ===
+/* The entire JS block is unchanged from your file */
 const VAC_PRICE = 1.5;
 const KG_STEP = 0.5; // skok dla kg
 const PRICES = {
