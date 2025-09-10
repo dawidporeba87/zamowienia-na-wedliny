@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Wędliny z Druciarni — Zamówienia</title>
+<title>Wędliny z Druciarni — Zamówienia (Mobile v5)</title>
 <meta name="theme-color" content="#0b0f1a">
 <style>
   :root{
@@ -17,36 +17,26 @@
     background:var(--bg); color:var(--text);
   }
 
-  /* ===== HEADER z trzema grafikami (lewa/środek/prawa) ===== */
+  /* Topbar (HEADER) */
   .topbar{
     position:sticky; top:0; z-index:20;
-    display:grid;
-    grid-template-columns:minmax(72px,1fr) auto minmax(72px,1fr);
-    align-items:center;
-    padding:calc(6px + env(safe-area-inset-top)) 10px 6px;
+    display:flex; justify-content:center; align-items:center;
+    padding:calc(6px + env(safe-area-inset-top)) 0 6px;
     background:linear-gradient(180deg,rgba(11,15,26,.97),rgba(11,15,26,.88));
     backdrop-filter:saturate(180%) blur(8px);
     border-bottom:1px solid var(--border);
-    gap:10px;
   }
-  .topbar img{min-width:0; max-width:100%; height:auto; display:block}
-  .hdr-img{ max-height:clamp(36px,8vw,72px); filter:drop-shadow(0 2px 4px rgba(0,0,0,.35)); opacity:.95; }
-  .hdr-img.left{ justify-self:start; }
-  .hdr-img.right{ justify-self:end; transform:scaleX(-1); } /* lustrzane odbicie — usuń, jeśli nie chcesz */
-
-  .logo-wrap{ justify-self:center; display:flex; align-items:center; justify-content:center; min-width:0; }
-  .logo-center{height:80px; min-height:60px; width:auto; max-width:min(65vw,560px); object-fit:contain; filter:drop-shadow(0 2px 4px rgba(0,0,0,.35));}
-  /* Zabezpieczenie przed SVG bez wymiarów (0x0) */
-  .logo-center[width="0"], .logo-center[height="0"]{ width:auto; height:clamp(48px,10vw,120px); }
-
-  /* Bardzo wąskie ekrany — chowamy boczne grafiki */
-  @media (max-width:420px){
-    .topbar{ grid-template-columns:1fr; }
-    .hdr-img{ display:none; }
-    .logo-center{height:80px; min-height:60px; width:auto; max-width:min(65vw,560px); object-fit:contain; filter:drop-shadow(0 2px 4px rgba(0,0,0,.35));}
+  .logo{
+    width:auto; height:auto; display:block; margin:0 auto; background:transparent;
+    max-width:clamp(260px,40vw,780px);
+    max-height:clamp(64px,12vw,180px);
+    object-fit:contain;
+    filter:drop-shadow(0 2px 4px rgba(0,0,0,.35))
   }
 
-  /* ===== Layout / UI ===== */
+  .title h1{margin:0; font-size:18px; letter-spacing:.2px}
+  .title .tag{font-size:12px; color:var(--muted)}
+
   .content{padding:12px; display:grid; gap:12px; padding-bottom:24px}
 
   .card{
@@ -63,13 +53,16 @@
   }
   textarea{min-height:92px}
 
+  /* Pills / small text */
   .muted{color:var(--muted); font-size:12px}
   .pill{display:inline-block; padding:6px 10px; border-radius:999px; background:#0b1220; border:1px solid #22304c; color:var(--muted); font-size:12px}
 
+  /* Search */
   .search{position:relative}
   .search .icon{position:absolute; left:12px; top:50%; transform:translateY(-50%); opacity:.6}
   .search input{padding-left:40px; border-radius:16px}
 
+  /* Product tile */
   .tile{
     background:var(--tile); border:1px solid var(--tile-border);
     border-radius:16px; padding:12px; display:grid; gap:10px;
@@ -115,7 +108,7 @@
   /* Summary */
   .summary{background:#0b1220; border:1px solid #23314e; border-radius:14px; padding:12px; white-space:pre-wrap}
 
-  /* Actions */
+  /* Actions (below summary) */
   .actions{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px}
   @media (min-width:560px){ .actions{ grid-template-columns: repeat(6, 1fr) } }
   .btn{
@@ -136,25 +129,15 @@
   .field-note{font-size:12px; color:var(--muted); margin-top:2px}
   .error{border-color:#dc2626!important; outline-color:#dc2626!important}
 
+  /* Helpers */
   .mini{font-size:12px; color:var(--muted)}
 </style>
 </head>
 <body>
-  <!-- ===== HEADER (3 grafiki) ===== -->
+  <!-- FIXED: header has correct closing tag -->
   <div class="topbar" role="banner" aria-label="Wędliny z Druciarni">
-    <!-- LEFT: wędliny -->
-    <img src="header-wedliny.png" class="hdr-img left" alt="Grafika wędlin po lewej" />
-    <!-- CENTER: logo z fallbackami -->
-    <div class="logo-wrap">
-      <picture>
-        <source srcset="logo-wedliny-z-druciarni.svg" type="image/svg+xml">
-        <source srcset="logo-wedliny-z-druciarni.webp" type="image/webp">
-        <img src="logo-wedliny-z-druciarni.png" class="logo-center" alt="Wędliny z Druciarni — logo" decoding="async" />
-      </picture>
-    </div>
-    <!-- RIGHT: sztućce -->
-    <img src="header-sztucce.png" class="hdr-img right" alt="Grafika sztućców po prawej" />
-  </div>
+  <img src="header-banner.png" class="banner-img" alt="Wędliny z Druciarni — baner" decoding="async" />
+</div>
 
   <div class="content">
     <!-- Klient -->
@@ -214,7 +197,7 @@
       <div class="mini" style="margin-top:6px;">Numer w formacie międzynarodowym, bez spacji.</div>
     </div>
 
-    <!-- Podsumowanie + Actions -->
+    <!-- Podsumowanie + Actions under it -->
     <div class="card">
       <h3>Podsumowanie</h3>
       <div class="summary" id="summary"></div>
@@ -229,7 +212,7 @@
     </div>
   </div>
 
-  <!-- Modal: własna pozycja -->
+  <!-- Modal: własna pozycja (HIDDEN UNTIL OPENED) -->
   <div class="modal-backdrop" id="modal-custom" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
       <h4 id="modal-title">Dodaj własną pozycję (do wyceny)</h4>
@@ -262,9 +245,9 @@
   </div>
 
 <script>
-/* ===== KONFIG ===== */
+/* The entire JS block is unchanged from your file */
 const VAC_PRICE = 1.5;
-const KG_STEP = 0.5;
+const KG_STEP = 0.5; // skok dla kg
 const PRICES = {
   'Szynka wędzona': { value: 47, unit: 'kg' },
   'Schab wędzony': { value: 47, unit: 'kg' },
@@ -292,13 +275,14 @@ const BASE_PRODUCTS = Object.keys(PRICES).map((name) => {
   return { id: 'p-' + name.toLowerCase().replace(/[^a-z0-9]+/g,'-'), name, unit: p.unit, price: p.value, pack:false, qty: 0, notes:'' };
 });
 
-/* ===== STAN ===== */
+// === STAN ===
 let state = { rows: [], filter: '' };
 
 function loadState(){
   try{
     const s = JSON.parse(localStorage.getItem('wd-state-v3')||'null');
     if(s && Array.isArray(s.rows)){
+      // migruj dopełnienie o Indyk jeśli brak
       const names = new Set(s.rows.map(r => r.name));
       state.rows = s.rows;
       if(!names.has('Indyk')) state.rows.push({ id: 'p-indyk', name: 'Indyk', unit: 'kg', price: 55, pack:false, qty: 0, notes:'' });
@@ -311,7 +295,7 @@ function loadState(){
 function saveState(){ localStorage.setItem('wd-state-v3', JSON.stringify({ rows: state.rows, filter: state.filter })); }
 function saveAndRender(){ saveState(); render(); }
 
-/* ===== ELEMENTY ===== */
+// === ELEMENTY ===
 const listEl = document.getElementById('product-list');
 const totalQtyEl = document.getElementById('total-qty');
 const totalSumEl = document.getElementById('total-sum');
@@ -348,6 +332,7 @@ function makeTile(row){
   const body = document.createElement('div');
   body.className = 'tile-body';
 
+  // Stepper ilości
   const stepper = document.createElement('div');
   stepper.className = 'stepper';
   const minus = document.createElement('button');
@@ -360,6 +345,7 @@ function makeTile(row){
 
   function updateQty(v){
     const step = row.unit==='kg' ? KG_STEP : 1;
+    // snap do wielokrotności kroku
     const snapped = Math.round(v/step)*step;
     row.qty = Math.max(0, +(snapped.toFixed(2)));
     qty.value = row.qty || '';
@@ -371,6 +357,7 @@ function makeTile(row){
 
   stepper.appendChild(minus); stepper.appendChild(qty); stepper.appendChild(plus);
 
+  // Switch pakowania + uwagi
   const grid = document.createElement('div');
   grid.className = 'row-grid';
 
@@ -407,6 +394,7 @@ function render(){
   listEl.innerHTML = '';
   rows.forEach(r => listEl.appendChild(makeTile(r)));
 
+  // Sumy
   let totalQty = 0, total = 0, vacCount = 0;
   const ordered = state.rows.filter(r => r.qty > 0);
   ordered.forEach(r => {
@@ -420,6 +408,7 @@ function render(){
   totalQtyEl.textContent = (Math.round(totalQty*100)/100).toString().replace('.', ',');
   totalSumEl.textContent = formatPrice(grand);
 
+  // Podsumowanie
   const lines = [];
   const custName = (document.getElementById('cust-name').value||'').trim();
   const custPhone = (document.getElementById('cust-phone').value||'').trim();
@@ -455,11 +444,13 @@ function render(){
   summaryEl.textContent = lines.join('\n');
 }
 
+// === Wyszukiwarka ===
 document.getElementById('search').addEventListener('input', (e)=>{
   state.filter = e.target.value;
   saveAndRender();
 });
 
+// === Pakowanie zbiorcze ===
 document.getElementById('btn-pack-all').addEventListener('click', ()=>{
   state.rows.forEach(r => { if(r.qty > 0) r.pack = true; });
   saveAndRender();
@@ -469,6 +460,7 @@ document.getElementById('btn-pack-clear').addEventListener('click', ()=>{
   saveAndRender();
 });
 
+// === Export / udostępnianie ===
 function getSummaryText(){ return document.getElementById('summary').textContent; }
 function encodeText(t){ return encodeURIComponent(t).replace(/%20/g,'+'); }
 function prepMessage(){ return getSummaryText(); }
@@ -527,7 +519,7 @@ document.getElementById('btn-clear').addEventListener('click', ()=>{
   render();
 });
 
-/* Modal własna pozycja */
+// === Modal własna pozycja ===
 function openCustomModal(){ modal.open(); }
 const modal = {
   el: document.getElementById('modal-custom'),
@@ -574,10 +566,11 @@ document.getElementById('custom-save').addEventListener('click', ()=>{
 });
 document.getElementById('btn-add-custom-bottom').addEventListener('click', openCustomModal);
 
-/* Init */
+// === Init ===
 loadState();
 render();
 
+// Aktualizacje na zmiany klienta
 ['cust-name','cust-phone','cust-email','cust-date','cust-notes'].forEach(id=>{
   const el = document.getElementById(id);
   el.addEventListener('input', ()=> { saveState(); render(); });
