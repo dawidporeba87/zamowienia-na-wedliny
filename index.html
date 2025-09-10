@@ -17,21 +17,38 @@
     background:var(--bg); color:var(--text);
   }
 
-  /* Topbar (HEADER) */
+  /* Topbar (HEADER) — updated to support 3 graphics: left (wędliny), center (logo), right (sztućce) */
   .topbar{
     position:sticky; top:0; z-index:20;
-    display:flex; justify-content:center; align-items:center;
-    padding:calc(6px + env(safe-area-inset-top)) 0 6px;
+    display:grid; grid-template-columns:1fr auto 1fr; align-items:center;
+    padding:calc(6px + env(safe-area-inset-top)) 10px 6px;
     background:linear-gradient(180deg,rgba(11,15,26,.97),rgba(11,15,26,.88));
     backdrop-filter:saturate(180%) blur(8px);
     border-bottom:1px solid var(--border);
+    gap:10px;
   }
-  .logo{
-    width:auto; height:auto; display:block; margin:0 auto; background:transparent;
-    max-width:clamp(260px,40vw,780px);
-    max-height:clamp(64px,12vw,180px);
+  .hdr-img{
+    max-height:clamp(36px,8vw,72px);
+    width:auto; object-fit:contain; filter:drop-shadow(0 2px 4px rgba(0,0,0,.35));
+    opacity:.95;
+  }
+  .hdr-img.left{ justify-self:start; }
+  .hdr-img.right{ justify-self:end; transform:scaleX(-1); } /* opcjonalne lustrzane odbicie, usuń jeśli niepotrzebne */
+
+  .logo-center{
+    width:auto; height:auto; display:block;
+    max-width:min(80vw, 820px);
+    max-height:clamp(48px,10vw,120px);
     object-fit:contain;
-    filter:drop-shadow(0 2px 4px rgba(0,0,0,.35))
+    filter:drop-shadow(0 2px 4px rgba(0,0,0,.35));
+    justify-self:center;
+  }
+
+  /* Gdy bardzo wąsko — chowamy boczne grafiki, zostawiamy tylko logo */
+  @media (max-width:420px){
+    .topbar{ grid-template-columns:1fr; }
+    .hdr-img{ display:none; }
+    .logo-center{ max-width:88vw; }
   }
 
   .title h1{margin:0; font-size:18px; letter-spacing:.2px}
@@ -134,9 +151,14 @@
 </style>
 </head>
 <body>
-  <!-- FIXED: header has correct closing tag -->
+  <!-- HEADER with three graphics -->
   <div class="topbar" role="banner" aria-label="Wędliny z Druciarni">
-    <img src="logo.png" class="logo" alt="Wędliny z Druciarni" />
+    <!-- LEFT: wędliny graphic -->
+    <img src="header-wedliny.png" class="hdr-img left" alt="Grafika wędlin po lewej" />
+    <!-- CENTER: main logo wordmark -->
+    <img src="logo-wedliny-z-druciarni.svg" class="logo-center" alt="Wędliny z Druciarni — logo" />
+    <!-- RIGHT: cutlery graphic -->
+    <img src="header-sztucce.png" class="hdr-img right" alt="Grafika sztućców po prawej" />
   </div>
 
   <div class="content">
@@ -245,7 +267,7 @@
   </div>
 
 <script>
-/* The entire JS block is unchanged from your file */
+/* JS identyczny jak w Twoim pliku — bez zmian funkcjonalnych */
 const VAC_PRICE = 1.5;
 const KG_STEP = 0.5; // skok dla kg
 const PRICES = {
