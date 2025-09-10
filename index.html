@@ -35,12 +35,7 @@
   .hdr-img.right{ justify-self:end; transform:scaleX(-1); } /* lustrzane odbicie — usuń, jeśli nie chcesz */
 
   .logo-wrap{ justify-self:center; display:flex; align-items:center; justify-content:center; min-width:0; }
-  .logo-center{
-    max-width:min(65vw, 560px);
-    max-height: 80px;
-    object-fit:contain;
-    filter:drop-shadow(0 2px 4px rgba(0,0,0,.35));
-  }
+  .logo-center{height:80px; min-height:60px; width:auto; max-width:min(65vw,560px); object-fit:contain; filter:drop-shadow(0 2px 4px rgba(0,0,0,.35));}
   /* Zabezpieczenie przed SVG bez wymiarów (0x0) */
   .logo-center[width="0"], .logo-center[height="0"]{ width:auto; height:clamp(48px,10vw,120px); }
 
@@ -48,7 +43,7 @@
   @media (max-width:420px){
     .topbar{ grid-template-columns:1fr; }
     .hdr-img{ display:none; }
-    .logo-center{ max-width:88vw; }
+    .logo-center{height:80px; min-height:60px; width:auto; max-width:min(65vw,560px); object-fit:contain; filter:drop-shadow(0 2px 4px rgba(0,0,0,.35));}
   }
 
   /* ===== Layout / UI ===== */
@@ -154,7 +149,7 @@
       <picture>
         <source srcset="logo-wedliny-z-druciarni.svg" type="image/svg+xml">
         <source srcset="logo-wedliny-z-druciarni.webp" type="image/webp">
-        <img src="logo-wedliny-z-druciarni.jpg" class="logo-center" alt="Wędliny z Druciarni — logo" decoding="async" />
+        <img src="logo-wedliny-z-druciarni.png" class="logo-center" alt="Wędliny z Druciarni — logo" decoding="async" />
       </picture>
     </div>
     <!-- RIGHT: sztućce -->
