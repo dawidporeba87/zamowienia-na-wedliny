@@ -9,6 +9,7 @@
   :root{
     --bg:#0b0f1a; --card:#111827; --muted:#9ca3af; --text:#e5e7eb; --accent:#fbbf24; --btn:#1f2937;
     --border:#1f2937; --tile:#0d1426; --tile-border:#1a2440;
+    --banner-h:128px;
   }
   *{box-sizing:border-box}
   html,body{height:100%}
@@ -21,12 +22,10 @@
   .topbar{
     position:sticky; top:0; z-index:20;
     display:flex; align-items:center; justify-content:center;
-    padding:4px 8px;
+    padding:8px 12px;
     background:linear-gradient(180deg,rgba(11,15,26,.97),rgba(11,15,26,.88));
     backdrop-filter:saturate(180%) blur(8px);
     border-bottom:1px solid var(--border);
-    overflow:hidden;
-    line-height:0;
   }
   .logo{
     width:auto; height:auto; display:block; margin:0 auto; background:transparent;
@@ -138,7 +137,7 @@
 <body>
   <!-- FIXED: header has correct closing tag -->
   <div class="topbar" role="banner" aria-label="Wędliny z Druciarni">
-  <img src="header-banner.png?v=2" class="banner-img" style="max-height:96px;height:auto;width:auto;max-width:100%" alt="Wędliny z Druciarni — baner" decoding="async" />
+  <img src="header-banner.png?v=2" class="banner-img" alt="Wędliny z Druciarni — baner" decoding="async" />
 </div>
 
   <div class="content">
