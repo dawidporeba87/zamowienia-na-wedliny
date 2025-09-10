@@ -21,10 +21,12 @@
   .topbar{
     position:sticky; top:0; z-index:20;
     display:flex; align-items:center; justify-content:center;
-    padding:calc(4px + env(safe-area-inset-top)) 10px 4px;
+    padding:4px 8px;
     background:linear-gradient(180deg,rgba(11,15,26,.97),rgba(11,15,26,.88));
     backdrop-filter:saturate(180%) blur(8px);
     border-bottom:1px solid var(--border);
+    overflow:hidden;
+    line-height:0;
   }
   .logo{
     width:auto; height:auto; display:block; margin:0 auto; background:transparent;
@@ -136,7 +138,7 @@
 <body>
   <!-- FIXED: header has correct closing tag -->
   <div class="topbar" role="banner" aria-label="Wędliny z Druciarni">
-  <img src="header-banner.png" class="banner-img" alt="Wędliny z Druciarni — baner" decoding="async" />
+  <img src="header-banner.png?v=2" class="banner-img" style="max-height:96px;height:auto;width:auto;max-width:100%" alt="Wędliny z Druciarni — baner" decoding="async" />
 </div>
 
   <div class="content">
