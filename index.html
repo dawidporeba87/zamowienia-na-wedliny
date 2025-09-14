@@ -27,12 +27,16 @@
     backdrop-filter:saturate(180%) blur(8px);
     border-bottom:1px solid var(--border);
   }
-  .logo{
-    width:auto; height:auto; display:block; margin:0 auto; background:transparent;
-    max-width:clamp(260px,40vw,780px);
-    max-height:clamp(64px,12vw,180px);
+
+  /* Scaled banner image */
+  .banner-img{
+    display:block;
+    width:100%;
+    height:auto;
+    max-height:clamp(68px, 12vw, 128px); /* <= główna zmiana: zgrabne skalowanie */
     object-fit:contain;
-    filter:drop-shadow(0 2px 4px rgba(0,0,0,.35))
+    margin:0 auto;
+    filter:drop-shadow(0 2px 4px rgba(0,0,0,.35));
   }
 
   .title h1{margin:0; font-size:18px; letter-spacing:.2px}
@@ -137,8 +141,9 @@
 <body>
   <!-- FIXED: header has correct closing tag -->
   <div class="topbar" role="banner" aria-label="Wędliny z Druciarni">
-  <img src="header-banner.png?v=2" class="banner-img" alt="Wędliny z Druciarni — baner" decoding="async" />
-</div>
+    <!-- Uwaga: poprawiony SRC (w repo masz plik z rozszerzeniem .PNG) -->
+    <img src="header-banner.PNG" class="banner-img" alt="Wędliny z Druciarni — baner" decoding="async" />
+  </div>
 
   <div class="content">
     <!-- Klient -->
